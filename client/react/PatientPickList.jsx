@@ -9,6 +9,10 @@ import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
 import TextField from 'material-ui/TextField';
 
+import { Patients } from '../../lib/Patients';
+import { Session } from 'meteor/session';
+
+
 Session.setDefault('patientDialogOpen', false);
 export class PatientPickList extends React.Component {
   constructor(props) {

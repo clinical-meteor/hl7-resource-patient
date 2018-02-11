@@ -7,7 +7,8 @@
 // import { insertPatient, removePatientById, updatePatient } from './lib/methods.js';
 
 import PatientsPage from './client/react/PatientsPage';
-//import LandingPage from './client/react/LandingPage';
+import PatientTable from './client/react/PatientTable';
+import { Patient, Patients, PatientSchema } from './lib/Patients';
 
 var DynamicRoutes = [{
   'name': 'PatientPage',
@@ -31,7 +32,7 @@ export {
   PatientsPage,
   // PatientDetail,
   // PatientPickList,
-  // PatientTable,
+  PatientTable,
 
   // attach these to the Patient object, plz
   // insertPatient, 

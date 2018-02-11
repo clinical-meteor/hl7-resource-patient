@@ -6,6 +6,11 @@ import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
 import { Table } from 'react-bootstrap';
 
+//import { Patients } from '../../lib/Patients';
+import { Session } from 'meteor/session';
+import { has, get } from 'lodash';
+
+
 export default class PatientTable extends React.Component {
   getMeteorData() {
     let data = {
@@ -46,6 +51,7 @@ export default class PatientTable extends React.Component {
       options.limit = this.props.limit;      
     }
 
+    // data.patients = [];
     data.patients = Patients.find(query, options).map(function(person){
       let result = {
         _id: person._id,
@@ -110,26 +116,26 @@ export default class PatientTable extends React.Component {
       );
     }
   }
-   onSend(id){
-      let patient = Patients.findOne({_id: id});
+  onSend(id){
+    let patient = Patients.findOne({_id: id});
 
-      console.log("PatientTable.onSend()", patient);
+    console.log("PatientTable.onSend()", patient);
 
-      var httpEndpoint = "http://localhost:8080";
-      if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.interfaces && Meteor.settings.public.interfaces.default && Meteor.settings.public.interfaces.default.channel && Meteor.settings.public.interfaces.default.channel.endpoint) {
-        httpEndpoint = Meteor.settings.public.interfaces.default.channel.endpoint;
-      }
-      HTTP.post(httpEndpoint + '/Patient', {
-        data: patient
-      }, function(error, result){
-        if (error) {
-          console.log("error", error);
-        }
-        if (result) {
-          console.log("result", result);
-        }
-      });
+    var httpEndpoint = "http://localhost:8080";
+    if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.interfaces && Meteor.settings.public.interfaces.default && Meteor.settings.public.interfaces.default.channel && Meteor.settings.public.interfaces.default.channel.endpoint) {
+      httpEndpoint = Meteor.settings.public.interfaces.default.channel.endpoint;
     }
+    HTTP.post(httpEndpoint + '/Patient', {
+      data: patient
+    }, function(error, result){
+      if (error) {
+        console.log("error", error);
+      }
+      if (result) {
+        console.log("result", result);
+      }
+    });
+  }
   render () {
     let tableRows = [];
     for (var i = 0; i < this.data.patients.length; i++) {

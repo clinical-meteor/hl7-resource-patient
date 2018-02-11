@@ -1,18 +1,18 @@
 import { CardText, CardTitle } from 'material-ui/Card';
 import { Tab, Tabs } from 'material-ui/Tabs';
+import { GlassCard, VerticalCanvas } from 'meteor/clinical:glass-ui';
 
 import Glass from './Glass';
-import GlassCard from './GlassCard';
+//import GlassCard from './GlassCard';
 import PatientDetail from './PatientDetail';
 import PatientTable from './PatientTable';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-import { FullPageCanvas } from './FullPageCanvas';
+//import { VerticalCanvas } from './VerticalCanvas';
 
 // import { Patients } from '../lib/Patients';
 import { Session } from 'meteor/session';
-
 
 let defaultPatient = {
   index: 2,
@@ -70,9 +70,10 @@ export class PatientsPage extends React.Component {
   }
 
   render() {
+    console.log('React.version: ' + React.version);
     return (
       <div id="patientsPage">
-        <FullPageCanvas>
+        <VerticalCanvas>
           <GlassCard height="auto">
             <CardTitle
               title="Patients"
@@ -93,7 +94,7 @@ export class PatientsPage extends React.Component {
 
             </CardText>
           </GlassCard>
-        </FullPageCanvas>
+        </VerticalCanvas>
       </div>
     );
   }
