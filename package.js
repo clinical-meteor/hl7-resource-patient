@@ -15,10 +15,10 @@ Package.onUse(function (api) {
   api.use('aldeed:simple-schema@1.3.3');
   api.use('simple:json-routes@2.1.0');
   api.use('momentjs:moment@2.17.1');
-  api.use('ecmascript');
+  api.use('ecmascript@0.9.0');
   api.use('session');
   api.use('http');
-  api.use('react-meteor-data');
+  api.use('react-meteor-data@0.2.15');
 
   api.use('clinical:glass-ui@2.1.1');
   api.use('clinical:extended-api@2.2.2');
