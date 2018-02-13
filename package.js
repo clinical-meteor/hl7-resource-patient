@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '3.2.6',
+  version: '3.2.9',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -31,6 +31,8 @@ Package.onUse(function (api) {
   api.imply('clinical:user-model');
 
   api.addFiles('lib/Patients.js');
+
+  api.addFiles('server/methods.js', 'server');
   api.addFiles('server/rest.js', 'server');
   api.addFiles('server/hooks.patients.js', 'server');
 
@@ -38,10 +40,6 @@ Package.onUse(function (api) {
     api.use('clinical:fhir-vault-server@0.0.3', ['client', 'server'], {weak: true});
   }
   
-  // these exports are put into the global context (but only on the server)
-  // api.export('Patient', 'server');
-  // api.export('Patients', 'server');
-  // api.export('PatientSchema', 'server');
   api.export('Patient');
   api.export('Patients');
   api.export('PatientSchema');
@@ -50,9 +48,5 @@ Package.onUse(function (api) {
 });
 
 
-// Npm.depends({
-//   "material-ui": "0.20.0",
-//   "lodash": "4.17.4"
-// });
 
 
