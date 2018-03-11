@@ -89,7 +89,7 @@ export default class PatientDetail extends React.Component {
             ref='name'
             name='name'
             floatingLabelText='name'
-            value={this.data.patient.name[0] ? this.data.patient.name[0].text : ''}
+            value={ get(this, 'data.patient.name[0].text', '')}
             onChange={ this.changeState.bind(this, 'name')}
             fullWidth
             /><br/>
@@ -98,7 +98,7 @@ export default class PatientDetail extends React.Component {
             ref='gender'
             name='gender'
             floatingLabelText='gender'
-            value={this.data.patient.gender}
+            value={ get(this, 'data.patient.gender', '')}
             onChange={ this.changeState.bind(this, 'gender')}
             fullWidth
             /><br/>
@@ -107,7 +107,7 @@ export default class PatientDetail extends React.Component {
             ref='birthdate'
             name='birthdate'
             floatingLabelText='birthdate'
-            value={this.data.patient.birthDate ? this.data.patient.birthDate : ''}
+            value={ get(this, 'data.patient.birthDate', '')}
             onChange={ this.changeState.bind(this, 'birthDate')}
             fullWidth
             /><br/>
@@ -116,7 +116,7 @@ export default class PatientDetail extends React.Component {
             ref='photo'
             name='photo'
             floatingLabelText='photo'
-            value={ (this.data.patient.photo && this.data.patient.photo[0]) ? this.data.patient.photo[0].url : ''}
+            value={ get(this, 'data.patient.photo[0].url', '')}
             onChange={ this.changeState.bind(this, 'photo')}
             floatingLabelFixed={false}
             fullWidth
@@ -126,7 +126,7 @@ export default class PatientDetail extends React.Component {
             ref='mrn'
             name='mrn'
             floatingLabelText='medical record number'
-            value={this.data.patient.identifier ? this.data.patient.identifier[0].value : ''}
+            value={ get(this, 'data.patient.identifier[0].value', '')}
             onChange={ this.changeState.bind(this, 'mrn')}
             fullWidth
             /><br/>

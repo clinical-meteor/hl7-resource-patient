@@ -30,14 +30,7 @@ export {
   DynamicRoutes, 
 
   PatientsPage,
-  // PatientDetail,
-  // PatientPickList,
   PatientTable,
-
-  // attach these to the Patient object, plz
-  // insertPatient, 
-  // removePatientById, 
-  // updatePatien
 
   Patient,
   Patients,
