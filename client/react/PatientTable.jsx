@@ -11,7 +11,7 @@ import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
 
 
-export default class PatientTable extends React.Component {
+export class PatientTable extends React.Component {
   getMeteorData() {
     let data = {
       style: {
@@ -157,7 +157,7 @@ export default class PatientTable extends React.Component {
 
 
     return(
-      <Table id='patientsTable' responses hover >
+      <Table id='patientsTable' hover >
         <thead>
           <tr>
 
@@ -176,10 +176,10 @@ export default class PatientTable extends React.Component {
           { tableRows }
         </tbody>
       </Table>
-
     );
   }
 }
 
 
 ReactMixin(PatientTable.prototype, ReactMeteorData);
+export default PatientTable;

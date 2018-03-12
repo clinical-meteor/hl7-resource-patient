@@ -24,7 +24,7 @@ let defaultPatient = {
   }],
   "active" : true,
   "gender" : "",
-  "birthDate" : null,
+  "birthDate" : '',
   "photo" : [{
     url: ""
   }],
@@ -98,6 +98,7 @@ export default class PatientDetail extends React.Component {
             ref='gender'
             name='gender'
             floatingLabelText='gender'
+            hintText='male | female | other | indeterminate | unknown'
             value={ get(this, 'data.patient.gender', '')}
             onChange={ this.changeState.bind(this, 'gender')}
             fullWidth
@@ -107,6 +108,7 @@ export default class PatientDetail extends React.Component {
             ref='birthdate'
             name='birthdate'
             floatingLabelText='birthdate'
+            hintText='YYYY-MM-DD'
             value={ get(this, 'data.patient.birthDate', '')}
             onChange={ this.changeState.bind(this, 'birthDate')}
             fullWidth
@@ -155,7 +157,7 @@ export default class PatientDetail extends React.Component {
   changeState(field, event, value){
     let patientUpdate;
 
-    if(process.env.NODE_ENV === "test") console.log("patientDetail.changeState", field, event, value);
+    if(process.env.TRACE) console.log("patientDetail.changeState", field, event, value);
 
     // by default, assume there's no other data and we're creating a new patient
     if (Session.get('patientUpsert')) {
@@ -223,8 +225,9 @@ export default class PatientDetail extends React.Component {
         }
         if (result) {
           HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: Session.get('selectedPatient')});
-          Session.set('patientUpdate', defaultPatient);
-          Session.set('patientUpsert', defaultPatient);
+          // Session.set('patientUpdate', defaultPatient);
+          Session.set('patientUpsert', false);
+          Session.set('selectedPatient', false);
           Session.set('patientPageTabIndex', 1);
           Bert.alert('Patient added!', 'success');
         }
@@ -260,9 +263,10 @@ export default class PatientDetail extends React.Component {
       }
       if (result) {
         HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: Session.get('selectedPatient')});
-        Session.set('patientUpdate', defaultPatient);
-        Session.set('patientUpsert', defaultPatient);
+        // Session.set('patientUpdate', defaultPatient);
+        Session.set('patientUpsert', false);
         Session.set('patientPageTabIndex', 1);
+        Session.set('selectedPatient', false);
         Bert.alert('Patient removed!', 'success');
       }
     });
