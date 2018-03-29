@@ -5,11 +5,37 @@ import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
 import { Table } from 'react-bootstrap';
-
-//import { Patients } from '../../lib/Patients';
 import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
+import { TableNoData } from 'meteor/clinical:glass-ui'
 
+
+flattenPatient = function(person){
+  let result = {
+    _id: person._id,
+    active: person.active.toString(),
+    gender: person.gender,
+    name: '',
+    mrn: '',
+    birthDate: '',
+    photo: "/thumbnail-blank.png",
+    initials: 'abc'
+  };
+
+  // there's an off-by-1 error between momment() and Date() that we want
+  // to account for when converting back to a string
+  result.birthDate = moment(person.birthDate).add(1, 'days').format("YYYY-MM-DD")
+  result.photo = get(person, 'photo[0].url', '');
+  result.mrn = get(person, 'identifier[0].value', '');
+
+  if(has(person, 'name[0].text')){
+    result.name = get(person, 'name[0].text');    
+  } else {
+    result.name = get(person, 'name[0].given[0]') + ' ' + get(person, 'name[0].family[0]');
+  }
+
+  return result;
+}
 
 export class PatientTable extends React.Component {
   getMeteorData() {
@@ -42,43 +68,30 @@ export class PatientTable extends React.Component {
 
     let query = {};
     let options = {};
+
     // number of items in the table should be set globally
-    if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.defaults && Meteor.settings.public.defaults.paginationLimit) {
-      options.limit = Meteor.settings.public.defaults.paginationLimit;
+    if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
+      options.limit = get(Meteor, 'settings.public.defaults.paginationLimit');
     }
     // but can be over-ridden by props being more explicit
     if(this.props.limit){
       options.limit = this.props.limit;      
     }
 
-    // data.patients = [];
-    data.patients = Patients.find(query, options).map(function(person){
-      let result = {
-        _id: person._id,
-        active: person.active.toString(),
-        gender: person.gender,
-        name: '',
-        mrn: '',
-        // there's an off-by-1 error between momment() and Date() that we want
-        // to account for when converting back to a string
-        birthDate: '',
-        photo: "/thumbnail-blank.png",
-        initials: 'abc'
-      };
-      if (person.birthDate) {
-        result.birthDate = moment(person.birthDate).add(1, 'days').format("YYYY-MM-DD")
+    if(this.props.data){
+      // console.log('this.props.data', this.props.data);
+
+      if(this.props.data.length > 0){              
+        this.props.data.forEach(function(patient){
+          data.patients.push(flattenPatient(patient));
+        });  
       }
-      if (person.name && person.name[0] && person.name[0].text) {
-        result.name = person.name[0].text;
-      }
-      if (person.photo && person.photo[0] && person.photo[0].url) {
-        result.photo = person.photo[0].url;
-      }
-      if (person.identifier && person.identifier[0] && person.identifier[0].value) {
-        result.mrn = person.identifier[0].value;
-      }
-      return result;
-    });
+    } else {
+      data.patients = Patients.find().map(function(patient){
+        return flattenPatient(patient);
+      });
+    }
+
 
     if (Session.get('appWidth') < 768) {
       data.style.hideOnPhone.visibility = 'hidden';
@@ -138,44 +151,54 @@ export class PatientTable extends React.Component {
   }
   render () {
     let tableRows = [];
-    for (var i = 0; i < this.data.patients.length; i++) {
-      tableRows.push(
-        <tr key={i} className="patientRow" style={{cursor: "pointer"}}>
+    let footer;
 
-          { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
-
-          <td className='name' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].name }</td>
-          <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
-          <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
-          <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
-          <td className='id' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}><span className="barcode">{this.data.patients[i]._id}</span></td>
-          <td className='mrn' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].mrn}</td>
-          <td className='sendButton' style={this.data.style.hideOnPhone}><FlatButton label="send" onClick={this.onSend.bind('this', this.data.patients[i]._id)}/></td>
-        </tr>
-      );
+    if(this.data.patients.length === 0){
+      footer = <TableNoData />
+    } else {
+      for (var i = 0; i < this.data.patients.length; i++) {
+        tableRows.push(
+          <tr key={i} className="patientRow" style={{cursor: "pointer"}}>
+  
+            { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
+  
+            <td className='name' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].name }</td>
+            <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
+            <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
+            <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
+            <td className='id' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}><span className="barcode">{this.data.patients[i]._id}</span></td>
+            <td className='mrn' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].mrn}</td>
+            <td className='sendButton' style={this.data.style.hideOnPhone}><FlatButton label="send" onClick={this.onSend.bind('this', this.data.patients[i]._id)}/></td>
+          </tr>
+        );
+      }
     }
+    
 
 
     return(
-      <Table id='patientsTable' hover >
-        <thead>
-          <tr>
+      <div>
+        <Table id='patientsTable' hover >
+          <thead>
+            <tr>
 
-            { this.renderRowAvatarHeader() }
+              { this.renderRowAvatarHeader() }
 
-            <th className='name'>name</th>
-            <th className='gender'>gender</th>
-            <th className='birthdate' style={{minWidth: '100px'}}>birthdate</th>
-            <th className='isActive' style={this.data.style.hideOnPhone}>active</th>
-            <th className='id' style={this.data.style.hideOnPhone}>_id</th>
-            <th className='mrn' style={this.data.style.hideOnPhone}>mrn</th>
-            <th className='sendButton' style={this.data.style.hideOnPhone}></th>
-          </tr>
-        </thead>
-        <tbody>
-          { tableRows }
-        </tbody>
-      </Table>
+              <th className='name'>name</th>
+              <th className='gender'>gender</th>
+              <th className='birthdate' style={{minWidth: '100px'}}>birthdate</th>
+              <th className='isActive' style={this.data.style.hideOnPhone}>active</th>
+              <th className='id' style={this.data.style.hideOnPhone}>_id</th>
+              <th className='mrn' style={this.data.style.hideOnPhone}>mrn</th>
+              <th className='sendButton' style={this.data.style.hideOnPhone}></th>
+            </tr>
+          </thead>
+          <tbody>
+            { tableRows }
+          </tbody>
+        </Table>
+        { footer }
+      </div>
     );
   }
 }

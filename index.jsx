@@ -8,6 +8,9 @@
 
 import PatientsPage from './client/react/PatientsPage';
 import PatientTable from './client/react/PatientTable';
+import PatientDetail from './client/react/PatientDetail';
+import PatientCard from './client/react/PatientCard';
+
 import { Patient, Patients, PatientSchema } from './lib/Patients';
 
 var DynamicRoutes = [{
@@ -31,6 +34,8 @@ export {
 
   PatientsPage,
   PatientTable,
+  PatientDetail,
+  PatientCard,
 
   Patient,
   Patients,
