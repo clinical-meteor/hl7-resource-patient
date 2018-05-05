@@ -60,7 +60,7 @@ export class PatientCard extends React.Component {
     }
     return (
       <div className='patientCard' {...otherProps} style={style.patientCard} >
-        <Card zDepth={2} style={ style.photo }>
+        <Card zDepth={this.props.zDepth} style={ style.photo }>
             <img className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ this.props.avatar }  style={ style.avatar} />
         </Card>
         <GlassCard>

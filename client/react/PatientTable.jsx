@@ -13,6 +13,7 @@ import { TableNoData } from 'meteor/clinical:glass-ui'
 flattenPatient = function(person){
   let result = {
     _id: person._id,
+    id: person.id,
     active: person.active.toString(),
     gender: person.gender,
     name: '',
@@ -38,6 +39,9 @@ flattenPatient = function(person){
 }
 
 export class PatientTable extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   getMeteorData() {
     let data = {
       style: {
@@ -48,7 +52,8 @@ export class PatientTable extends React.Component {
         cellHideOnPhone: {
           visibility: 'visible',
           display: 'table',
-          paddingTop: '16px'
+          paddingTop: '16px',
+          maxWidth: '120px'
         },
         cell: {
           paddingTop: '16px'
@@ -114,17 +119,33 @@ export class PatientTable extends React.Component {
     Session.set('patientPageTabIndex', 2);
   }
   renderRowAvatarHeader(){
-    if (Meteor.settings.public.defaults.avatars) {
+    if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
       return (
         <th className='avatar'>photo</th>
       );
     }
   }
   renderRowAvatar(patient, avatarStyle){
-    if (Meteor.settings.public.defaults.avatars) {
+    if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
       return (
         <td className='avatar'>
           <img src={patient.photo} style={avatarStyle}/>
+        </td>
+      );
+    }
+  }
+  renderSendButtonHeader(){
+    if (this.props.showSendButton === true) {
+      return (
+        <th className='sendButton' style={this.data.style.hideOnPhone}></th>
+      );
+    }
+  }
+  renderSendButton(patient, avatarStyle){
+    if (this.props.showSendButton === true) {
+      return (
+        <td className='sendButton' style={this.data.style.hideOnPhone}>
+          <FlatButton label="send" onClick={this.onSend.bind('this', this.data.patients[i]._id)}/>
         </td>
       );
     }
@@ -135,8 +156,8 @@ export class PatientTable extends React.Component {
     console.log("PatientTable.onSend()", patient);
 
     var httpEndpoint = "http://localhost:8080";
-    if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.interfaces && Meteor.settings.public.interfaces.default && Meteor.settings.public.interfaces.default.channel && Meteor.settings.public.interfaces.default.channel.endpoint) {
-      httpEndpoint = Meteor.settings.public.interfaces.default.channel.endpoint;
+    if (get(Meteor, 'settings.public.interfaces.default.channel.endpoint')) {
+      httpEndpoint = get(Meteor, 'settings.public.interfaces.default.channel.endpoint');
     }
     HTTP.post(httpEndpoint + '/Patient', {
       data: patient
@@ -149,16 +170,21 @@ export class PatientTable extends React.Component {
       }
     });
   }
+  selectPatientRow(patientId){
+    if(typeof(this.props.onRowClick) === "function"){
+      this.props.onRowClick(patientId);
+    }
+  }
   render () {
     let tableRows = [];
     let footer;
 
     if(this.data.patients.length === 0){
-      footer = <TableNoData />
+      footer = <TableNoData noDataPadding={ this.props.noDataPadding } />
     } else {
       for (var i = 0; i < this.data.patients.length; i++) {
         tableRows.push(
-          <tr key={i} className="patientRow" style={{cursor: "pointer"}}>
+          <tr key={i} className="patientRow" style={{cursor: "pointer"}} onClick={this.selectPatientRow.bind(this, this.data.patients[i].id )} >
   
             { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
   
@@ -166,9 +192,10 @@ export class PatientTable extends React.Component {
             <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
             <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
             <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
-            <td className='id' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}><span className="barcode">{this.data.patients[i]._id}</span></td>
             <td className='mrn' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].mrn}</td>
-            <td className='sendButton' style={this.data.style.hideOnPhone}><FlatButton label="send" onClick={this.onSend.bind('this', this.data.patients[i]._id)}/></td>
+            <td className='id' onClick={ this.rowClick.bind('this', this.data.patients[i].id)} style={this.data.style.cellHideOnPhone}><span className="barcode">{this.data.patients[i].id}</span></td>            
+
+              { this.renderSendButton(this.data.patients[i], this.data.style.avatar) }
           </tr>
         );
       }
@@ -181,16 +208,16 @@ export class PatientTable extends React.Component {
         <Table id='patientsTable' hover >
           <thead>
             <tr>
-
               { this.renderRowAvatarHeader() }
 
               <th className='name'>name</th>
               <th className='gender'>gender</th>
               <th className='birthdate' style={{minWidth: '100px'}}>birthdate</th>
               <th className='isActive' style={this.data.style.hideOnPhone}>active</th>
-              <th className='id' style={this.data.style.hideOnPhone}>_id</th>
               <th className='mrn' style={this.data.style.hideOnPhone}>mrn</th>
-              <th className='sendButton' style={this.data.style.hideOnPhone}></th>
+              <th className='id' style={this.data.style.hideOnPhone}>_id</th>
+              
+              { this.renderSendButtonHeader() }
             </tr>
           </thead>
           <tbody>
