@@ -11,7 +11,7 @@ export default Glass = {
     if (style) {
       if (Session.get('glassBlurEnabled')) {
         style.filter = 'blur(3px)';
-        style.webkitFilter = 'blur(3px)';
+        style.WebkitFilter = 'blur(3px)';
       }
     }
     return style;

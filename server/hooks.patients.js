@@ -2,6 +2,7 @@ import { HTTP } from 'meteor/http';
 import { Meteor } from 'meteor/meteor';
 
 import { Patients } from '../lib/Patients';
+import { get } from 'lodash';
 
 Patients.after.insert(function (userId, doc) {
 
@@ -10,8 +11,8 @@ Patients.after.insert(function (userId, doc) {
 
   // RELAY/SEND FUNCTIONALITY
   // interface needs to be active in order to send the messages
-  if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.interfaces && Meteor.settings.public.interfaces.default && Meteor.settings.public.interfaces.default.status && (Meteor.settings.public.interfaces.default.status === "active")) {
-    HTTP.put(Meteor.settings.public.interfaces.default.channel.endpoint + '/Patient', {
+  if (get(Meteor, 'settings.public.interfaces.default.status') === "active") {
+    HTTP.put(get(Meteor, 'settings.public.interfaces.default.channel.endpoint') + '/Patient', {
       data: doc
     }, function(error, result){
       if (error) {
@@ -29,8 +30,8 @@ Patients.after.update(function (userId, doc) {
   HipaaLogger.logEvent({eventType: "update", userId: userId, userName: '', collectionName: "Patients"});
 
   // interface needs to be active in order to send the messages
-  if (Meteor.settings && Meteor.settings.public && Meteor.settings.public.interfaces && Meteor.settings.public.interfaces.default && Meteor.settings.public.interfaces.default.status && (Meteor.settings.public.interfaces.default.status === "active")) {
-    HTTP.post(Meteor.settings.public.interfaces.default.channel.endpoint + '/Patient', {
+  if (get(Meteor, 'settings.public.interfaces.default.status') === "active") {
+    HTTP.put(get(Meteor, 'settings.public.interfaces.default.channel.endpoint') + '/Patient', {
       data: doc
     }, function(error, result){
       if (error) {

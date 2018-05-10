@@ -61,7 +61,7 @@ export class PatientCard extends React.Component {
     return (
       <div className='patientCard' {...otherProps} style={style.patientCard} >
         <Card zDepth={this.props.zDepth} style={ style.photo }>
-            <img className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ this.props.avatar }  style={ style.avatar} />
+            <img id='avatarImage' className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ this.props.avatar } style={ style.avatar} />
         </Card>
         <GlassCard>
             <CardTitle
@@ -149,7 +149,7 @@ export class PatientCard extends React.Component {
     );
   }
   imgError() {
-    this.refs.avatarImage.src = Meteor.absoluteUrl() + '/noAvatar.png';
+    this.refs.avatarImage.src = Meteor.absoluteUrl() + 'noAvatar.png';
   }
 }
 
