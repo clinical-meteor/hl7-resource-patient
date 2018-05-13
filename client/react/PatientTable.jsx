@@ -113,6 +113,9 @@ export class PatientTable extends React.Component {
     // console.log("PatientTable[data]", data);
     return data;
   }
+  imgError(avatarId) {
+    this.refs[avatarId].src = Meteor.absoluteUrl() + 'noAvatar.png';
+  }
   rowClick(id){
     Session.set('patientsUpsert', false);
     Session.set('selectedPatient', id);
@@ -126,10 +129,11 @@ export class PatientTable extends React.Component {
     }
   }
   renderRowAvatar(patient, avatarStyle){
+    console.log('renderRowAvatar', patient, avatarStyle)
     if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
       return (
         <td className='avatar'>
-          <img src={patient.photo} style={avatarStyle}/>
+          <img src={patient.photo} ref={patient._id} onError={ this.imgError.bind(this, patient._id) } style={avatarStyle}/>
         </td>
       );
     }

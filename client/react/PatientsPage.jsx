@@ -84,7 +84,7 @@ export class PatientsPage extends React.Component {
                    <PatientDetail id='newPatient' />
                  </Tab>
                  <Tab className="patientListTab" label='Patients' onActive={this.handleActive} style={this.data.style.tab} value={1}>
-                   <PatientTable showBarcodes={true} />
+                   <PatientTable showBarcodes={true} showAvatars={true} />
                  </Tab>
                  <Tab className="patientDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
                    <PatientDetail id='patientDetails' currentPatient={this.data.currentPatient} />
