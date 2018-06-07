@@ -80,7 +80,7 @@ export class PatientCard extends React.Component {
                         name='given'
                         type='text'
                         floatingLabelText='given name'
-                        value={ givenName }
+                        defaultValue={ givenName }
                         onChange={ this.props.updateGivenName ? this.props.updateGivenName.bind(this) : null }
                         fullWidth
                         /><br/>
@@ -92,7 +92,7 @@ export class PatientCard extends React.Component {
                         name='family'
                         type='text'
                         floatingLabelText='family name'
-                        value={ familyName }
+                        defaultValue={ familyName }
                         onChange={ this.props.updateFamilyName ? this.props.updateFamilyName.bind(this) : null }
                         fullWidth
                         /><br/>
@@ -107,7 +107,7 @@ export class PatientCard extends React.Component {
                         type='date'
                         floatingLabelText='date of birth (yyyy-mm-dd)'
                         floatingLabelFixed={true}
-                        value={ birthdate }                          
+                        defaultValue={ birthdate }                          
                         onChange={ this.props.updateBirthdate ? this.props.updateBirthdate.bind(this) : null }
                         fullWidth
                         /><br/>
@@ -119,7 +119,7 @@ export class PatientCard extends React.Component {
                         name='gender'
                         type='text'
                         floatingLabelText='gender'
-                        value={ gender }
+                        defaultValue={ gender }
                         onChange={ this.props.updateGender ? this.props.updateGender.bind(this) : null }
                         fullWidth
                         /><br/>
@@ -132,7 +132,7 @@ export class PatientCard extends React.Component {
                         name='avatar'
                         type='text'
                         floatingLabelText='avatar'
-                        value={ avatar }
+                        defaultValue={ avatar }
                         onChange={ this.props.updateAvatar ? this.props.updateAvatar.bind(this) : null }
                         fullWidth
                         /><br/>
