@@ -44,12 +44,12 @@ export class PatientCard extends React.Component {
     super(props);
   }
   render(){
-      console.log('PatientCard', this.props.patient)
+    // console.log('PatientCard', this.props.patient)
 
 
-    const { active, familyName, givenName, fullName, email, birthdate, gender, avatar, ...otherProps } = this.props;
+    const { active, familyName, givenName, fullName, email, birthdate, gender, avatar, patient, zDepth, ...otherProps } = this.props;
 
-    if ( this.props.patient ) {
+    if ( patient ) {
         fullName = get(this, 'props.patient.name[0].text');
         familyName = get(this, 'props.patient.name[0].family[0]');        
         givenName = get(this, 'props.patient.name[0].given[0]');
@@ -60,7 +60,7 @@ export class PatientCard extends React.Component {
     }
     return (
       <div className='patientCard' {...otherProps} style={style.patientCard} >
-        <Card zDepth={this.props.zDepth} style={ style.photo }>
+        <Card zDepth={zDepth} style={ style.photo }>
             <img id='avatarImage' className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ this.props.avatar } style={ style.avatar} />
         </Card>
         <GlassCard>
