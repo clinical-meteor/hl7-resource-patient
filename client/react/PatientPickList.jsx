@@ -43,13 +43,13 @@ export class PatientPickList extends React.Component {
       <FlatButton
         label="Clear"
         primary={true}
-        onTouchTap={this.handleClosePatients}
+        onClick={this.handleClosePatients}
       />,
       <FlatButton
         label="Select"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={this.handleClosePatients}
+        onClick={this.handleClosePatients}
       />
     ];
     return(
@@ -69,7 +69,7 @@ export class PatientPickList extends React.Component {
                 label="Patients"
                 className="patientsButton"
                 primary={true}
-                onTouchTap={this.handleOpenPatients}
+                onClick={this.handleOpenPatients}
                 icon={ <AccountCircle /> }
                 style={{textAlign: 'right', cursor: 'pointer'}}
               />

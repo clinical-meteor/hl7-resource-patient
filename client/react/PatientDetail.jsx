@@ -5,7 +5,7 @@ import { get, has, set } from 'lodash';
 import { insertPatient, removePatientById, updatePatient } from 'meteor/clinical:hl7-resource-patient';
 
 
-import { Bert } from 'meteor/themeteorchef:bert';
+import { Bert } from 'meteor/clinical:alert';
 import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
