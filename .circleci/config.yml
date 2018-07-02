@@ -110,7 +110,7 @@ jobs:
     - run: cd ../baseline && ls -la
 
     - run: cd ../baseline && meteor npm install
-    - run: cd ../baseline && meteor npm install react
+    - run: cd ../baseline && meteor npm install react lodash
     - run: cd ../baseline && mkdir packages && cd packages && mkdir hl7-resource-patient 
     - run: cp -R ./* ../baseline/packages/hl7-resource-patient 
     - run: cd ../baseline/packages/hl7-resource-patient && pwd
