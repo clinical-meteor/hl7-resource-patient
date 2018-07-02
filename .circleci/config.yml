@@ -102,7 +102,7 @@ jobs:
     - run: cd .. && meteor create --release METEOR@1.6.0.1 --bare baseline
     # - run: git clone https://github.com/meteor/todos -b react
 
-    - run: cd .. && meteor remove static-html
+    - run: cd ../baseline && meteor remove static-html
 
     - run: cd ../baseline && meteor --version
     - run: ls -la
