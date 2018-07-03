@@ -1,15 +1,18 @@
 ##  clinical:hl7-resource-patient   
 
-HL7 FHIR Resource - Patient
+#### Licensing  
+![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 
---------------------------------------------  
-#### Schema Version 
-
-The resource in this package implements the `FHIR 1.6.0 - STU3 Ballot` version of the Patient resource schema, specified at  [http://hl7.org/fhir/2016Sep/patient.html](http://hl7.org/fhir/2016Sep/patient.html).  
+#### Integration & Verification Tests  
+[![CircleCI](https://circleci.com/gh/clinical-meteor/hl7-resource-patient/tree/master.svg?style=svg)](https://circleci.com/gh/clinical-meteor/hl7-resource-patient/tree/master)
 
 
---------------------------------------------  
+#### API Reference  
+The resource in this package implements Patient resource schema, specified at [https://www.hl7.org/fhir/patient.html](https://www.hl7.org/fhir/patient.html). 
+
+
+
 #### Installation  
 
 ```bash
@@ -23,7 +26,7 @@ meteor add clinical:autopublish
 ```
 
 
---------------------------------------------  
+
 #### Example    
 
 ```js
@@ -59,7 +62,7 @@ var newPatient = {
 Patients.insert(newPatient);
 ```
 
---------------------------------------------  
+
 #### Extending the Schema  
 
 If you have extra fields that you would like to attach to the schema, extend the schema like so:  
@@ -77,7 +80,7 @@ ExtendedPatientSchema = new SimpleSchema([
 Patients.attachSchema( ExtendedPatientSchema );
 ```
 
---------------------------------------------  
+
 #### Initialize a Sample Patient  
 
 Call the `initializePatient` method to create a sample patient in the Patients collection.
@@ -87,12 +90,12 @@ Meteor.startup(function(){
   Meteor.call('initializePatient');
 })
 ```
---------------------------------------------  
+
 #### Server Methods  
 
 This package supports `createPatient`, `initializePatient`, and `dropPatient` methods.
 
---------------------------------------------  
+
 #### REST API Points    
 
 This package supports the following REST API endpoints.  All endpoints require an OAuth token.  
@@ -113,7 +116,7 @@ If you would like to test the REST API without the OAuth infrastructure, launch 
 NOAUTH=true meteor
 ```
 
---------------------------------------------  
+
 #### Conformance Statement  
 
 This package conforms to version `FHIR 1.6.0 - STU3 Ballot`, as per the Touchstone testing utility.  
@@ -121,7 +124,3 @@ This package conforms to version `FHIR 1.6.0 - STU3 Ballot`, as per the Touchsto
 ![https://raw.githubusercontent.com/clinical-meteor/hl7-resource-patient/master/screenshots/Screen%20Shot%202017-03-18%20at%2010.56.09%20PM.png](https://raw.githubusercontent.com/clinical-meteor/hl7-resource-patient/master/screenshots/Screen%20Shot%202017-03-18%20at%2010.56.09%20PM.png)  
 
 
---------------------------------------------  
-#### Licensing   
-
-![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
