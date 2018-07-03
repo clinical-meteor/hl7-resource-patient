@@ -9,7 +9,7 @@
 
 
 #### API Reference  
-The resource in this package implements Patient resource schema, specified at [https://www.hl7.org/fhir/patient.html](https://www.hl7.org/fhir/patient.html). 
+The resource in this package implements Patient resource schema, specified at [https://www.hl7.org/fhir/DSTU2/patient.html](https://www.hl7.org/fhir/DSTU2/patient.html). 
 
 
 
