@@ -47,7 +47,7 @@ export class PatientCard extends React.Component {
     // console.log('PatientCard', this.props.patient)
 
 
-    const { active, familyName, givenName, fullName, email, birthdate, gender, avatar, patient, zDepth, ...otherProps } = this.props;
+    let { active, familyName, givenName, fullName, email, birthdate, gender, avatar, patient, zDepth, ...otherProps } = this.props;
 
     if ( patient ) {
         fullName = get(this, 'props.patient.name[0].text');
