@@ -39,27 +39,33 @@ const style = {
         position: 'relative'
     }
 }
+
+
 export class PatientCard extends React.Component {
   constructor(props) {
     super(props);
   }
   render(){
-    // console.log('PatientCard', this.props.patient)
+    console.log('PatientCard', this.props)
 
 
     let { active, familyName, givenName, fullName, email, birthdate, gender, avatar, patient, zDepth, ...otherProps } = this.props;
 
     if ( patient ) {
-        fullName = get(this, 'props.patient.name[0].text');
-        familyName = get(this, 'props.patient.name[0].family[0]');        
-        givenName = get(this, 'props.patient.name[0].given[0]');
-        email = get(this, 'props.patient.contact[0].value');
-        birthdate = get(this, 'props.patient.birthDate');
-        gender = get(this, 'props.patient.gender');
-        avatar = get(this, 'props.patient.photo[0].url', '');
+      fullName = get(this, 'props.patient.name[0].text');
+      familyName = get(this, 'props.patient.name[0].family[0]');        
+      givenName = get(this, 'props.patient.name[0].given[0]');
+      email = get(this, 'props.patient.contact[0].value');
+      birthdate = get(this, 'props.patient.birthDate');
+      gender = get(this, 'props.patient.gender');
+      avatar = get(this, 'props.patient.photo[0].url', '');
     }
+
+
+
     return (
-      <div className='patientCard' {...otherProps} style={style.patientCard} >
+      // <div className='patientCard' {...otherProps} style={style.patientCard} >
+      <div className='patientCard' style={style.patientCard} >
         <Card zDepth={zDepth} style={ style.photo }>
             <img id='avatarImage' className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ this.props.avatar } style={ style.avatar} />
         </Card>
