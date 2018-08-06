@@ -46,22 +46,19 @@ export class PatientCard extends React.Component {
     super(props);
   }
   render(){
+    console.log('&&&&&&&&&&&&&&&&&&&')
     console.log('PatientCard', this.props)
 
 
     let { active, familyName, givenName, fullName, email, birthdate, gender, avatar, patient, zDepth, ...otherProps } = this.props;
 
-    if ( patient ) {
-      fullName = get(this, 'props.patient.name[0].text');
-      familyName = get(this, 'props.patient.name[0].family[0]');        
-      givenName = get(this, 'props.patient.name[0].given[0]');
-      email = get(this, 'props.patient.contact[0].value');
-      birthdate = get(this, 'props.patient.birthDate');
-      gender = get(this, 'props.patient.gender');
-      avatar = get(this, 'props.patient.photo[0].url', '');
-    }
-
-
+    fullName = get(this, 'props.patient.name[0].text', '');
+    familyName = get(this, 'props.patient.name[0].family[0]', '');        
+    givenName = get(this, 'props.patient.name[0].given[0]', '');
+    email = get(this, 'props.patient.contact[0].value', '');
+    birthdate = get(this, 'props.patient.birthDate', '');
+    gender = get(this, 'props.patient.gender', '');
+    avatar = get(this, 'props.patient.photo[0].url', '');
 
     return (
       // <div className='patientCard' {...otherProps} style={style.patientCard} >
@@ -86,7 +83,7 @@ export class PatientCard extends React.Component {
                         name='given'
                         type='text'
                         floatingLabelText='given name'
-                        defaultValue={ givenName }
+                        value={ givenName }
                         onChange={ this.props.updateGivenName ? this.props.updateGivenName.bind(this) : null }
                         fullWidth
                         /><br/>
@@ -98,34 +95,34 @@ export class PatientCard extends React.Component {
                         name='family'
                         type='text'
                         floatingLabelText='family name'
-                        defaultValue={ familyName }
+                        value={ familyName }
                         onChange={ this.props.updateFamilyName ? this.props.updateFamilyName.bind(this) : null }
                         fullWidth
                         /><br/>
                     </Col>
                   </Row>
                   <Row style={ style.synopsis }>
-                    <Col md={3}>
+                    <Col md={4}>
                       <TextField
                         id='birthdateInput'
                         ref='birthdate'
                         name='birthdate'
                         type='date'
-                        floatingLabelText='date of birth (yyyy-mm-dd)'
+                        floatingLabelText='date of birth'
                         floatingLabelFixed={true}
-                        defaultValue={ birthdate }                          
+                        value={ birthdate }                          
                         onChange={ this.props.updateBirthdate ? this.props.updateBirthdate.bind(this) : null }
                         fullWidth
                         /><br/>
                     </Col>
-                    <Col md={3}>
+                    <Col md={2}>
                       <TextField
                         id='genderInput'
                         ref='gender'
                         name='gender'
                         type='text'
                         floatingLabelText='gender'
-                        defaultValue={ gender }
+                        value={ gender }
                         onChange={ this.props.updateGender ? this.props.updateGender.bind(this) : null }
                         fullWidth
                         /><br/>
@@ -138,7 +135,7 @@ export class PatientCard extends React.Component {
                         name='avatar'
                         type='text'
                         floatingLabelText='avatar'
-                        defaultValue={ avatar }
+                        value={ avatar }
                         onChange={ this.props.updateAvatar ? this.props.updateAvatar.bind(this) : null }
                         fullWidth
                         /><br/>
