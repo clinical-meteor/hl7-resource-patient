@@ -59,12 +59,13 @@ export class PatientCard extends React.Component {
     birthdate = get(this, 'props.patient.birthDate', '');
     gender = get(this, 'props.patient.gender', '');
     avatar = get(this, 'props.patient.photo[0].url', '');
+    // avatarImg = get(this, 'props.patient.photo[0].url', '/packages/clinical_hl7-resource-patient/assets/noAvatar.png');
 
     return (
       // <div className='patientCard' {...otherProps} style={style.patientCard} >
       <div className='patientCard' style={style.patientCard} >
         <Card zDepth={zDepth} style={ style.photo }>
-            <img id='avatarImage' className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ this.props.avatar } style={ style.avatar} />
+            <img id='avatarImage' className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ avatar } style={ style.avatar} />
         </Card>
         <GlassCard>
             <CardTitle
@@ -152,7 +153,7 @@ export class PatientCard extends React.Component {
     );
   }
   imgError() {
-    this.refs.avatarImage.src = Meteor.absoluteUrl() + 'noAvatar.png';
+    this.refs.avatarImage.src = Meteor.absoluteUrl() + 'packages/clinical_hl7-resource-patient/assets/noAvatar.png';
   }
 }
 

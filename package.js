@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '3.2.34',
+  version: '3.3.0',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -44,6 +44,8 @@ Package.onUse(function (api) {
   api.export('Patient');
   api.export('Patients');
   api.export('PatientSchema');
+
+  api.addFiles('assets/noAvatar.png', "client", {isAsset: true});    
 
   api.mainModule('index.jsx', 'client');
 });
