@@ -5,7 +5,7 @@ import { get, has, set } from 'lodash';
 import { insertPatient, removePatientById, updatePatient } from 'meteor/clinical:hl7-resource-patient';
 
 
-import { Bert } from 'meteor/clinical:alert';
+// import { Bert } from 'meteor/clinical:alert';
 import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
@@ -235,7 +235,7 @@ export default class PatientDetail extends React.Component {
     } else {
       if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", patientUpdate);
 
-      Patients.insert(patientUpdate, function(error, result) {
+      Patients.insert(patientUpdate, {validate: false}, function(error, result) {
         if (error) {
           if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
           Bert.alert(error.reason, 'danger');
