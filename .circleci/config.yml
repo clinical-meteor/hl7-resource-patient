@@ -108,13 +108,13 @@ jobs:
     - run: cd ../baseline && ls -la
 
     - run: cd ../baseline && meteor npm install
-    - run: cd ../baseline && meteor npm install react lodash
+    - run: cd ../baseline && meteor npm install react lodash simpl-schema
     - run: cd ../baseline && mkdir packages && cd packages && mkdir hl7-resource-patient 
     - run: cp -R ./* ../baseline/packages/hl7-resource-patient 
     - run: cd ../baseline/packages/hl7-resource-patient && pwd
     - run: cd ../baseline/packages && ls -la
 
-    - run: cd ../baseline && npm i --save-dev selenium-webdriver@3.0.0-beta-2 chromedriver
+    - run: cd ../baseline && npm i --save-dev selenium-webdriver@3.6.0 chromedriver
     - run: cd ../baseline && meteor add dispatch:mocha practicalmeteor:chai
     - run: cd ../baseline && meteor add clinical:hl7-resource-patient 
     - run: cd ../baseline && mkdir imports 
