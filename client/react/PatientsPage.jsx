@@ -1,17 +1,15 @@
 import { CardText, CardTitle } from 'material-ui/Card';
 import { Tab, Tabs } from 'material-ui/Tabs';
-import { GlassCard, VerticalCanvas } from 'meteor/clinical:glass-ui';
+import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
 
-import Glass from './Glass';
-//import GlassCard from './GlassCard';
 import PatientDetail from './PatientDetail';
 import PatientTable from './PatientTable';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-//import { VerticalCanvas } from './VerticalCanvas';
+import PropTypes from 'prop-types';
 
-// import { Patients } from '../lib/Patients';
+import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 
 let defaultPatient = {
@@ -25,6 +23,8 @@ let defaultPatient = {
 };
 Session.setDefault('patientFormData', defaultPatient);
 Session.setDefault('patientSearchFilter', '');
+Session.setDefault('selectedPatientId', false);
+Session.setDefault('fhirVersion', 'v1.0.2');
 
 export class PatientsPage extends React.Component {
   getMeteorData() {
@@ -37,20 +37,19 @@ export class PatientsPage extends React.Component {
         }
       },
       tabIndex: Session.get('patientPageTabIndex'),
-      patient: defaultPatient,
-      patientSearchFilter: '',
-      currentPatient: null
+      patientSearchFilter: Session.get('patientSearchFilter'),
+      fhirVersion: Session.get('fhirVersion'),
+      selectedPatientId: Session.get("selectedPatientId"),
+      selectedPatient: false
     };
 
-    if (Session.get('patientFormData')) {
-      data.patient = Session.get('patientFormData');
+    
+    if (Session.get('selectedPatientId')){
+      data.selectedPatient = Patients.findOne({_id: Session.get('selectedPatientId')});
+    } else {
+      data.selectedPatient = false;
     }
-    if (Session.get('patientSearchFilter')) {
-      data.patientSearchFilter = Session.get('patientSearchFilter');
-    }
-    if (Session.get("selectedPatient")) {
-      data.currentPatient = Session.get("selectedPatient");
-    }
+
 
     data.style = Glass.blur(data.style);
     data.style.appbar = Glass.darkroom(data.style.appbar);
@@ -65,7 +64,7 @@ export class PatientsPage extends React.Component {
   }
 
   onNewTab(){
-    Session.set('selectedPatient', false);
+    Session.set('selectedPatientId', false);
     Session.set('patientUpsert', false);
   }
 
@@ -81,13 +80,24 @@ export class PatientsPage extends React.Component {
             <CardText>
               <Tabs id='patientsPageTabs' default value={this.data.tabIndex} onChange={this.handleTabChange} initialSelectedIndex={1}>
                  <Tab className="newPatientTab" label='New' style={this.data.style.tab} onActive={ this.onNewTab } value={0}>
-                   <PatientDetail id='newPatient' />
+                   <PatientDetail 
+                      fhirVersion={ this.data.fhirVersion }
+                      id='newPatient' />
                  </Tab>
                  <Tab className="patientListTab" label='Patients' onActive={this.handleActive} style={this.data.style.tab} value={1}>
-                   <PatientTable showBarcodes={true} showAvatars={true} />
+                   <PatientTable 
+                      showBarcodes={true} 
+                      showAvatars={true} 
+                      noDataMessagePadding={100}
+                      />
                  </Tab>
                  <Tab className="patientDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
-                   <PatientDetail id='patientDetails' currentPatient={this.data.currentPatient} />
+                   <PatientDetail 
+                      id='patientDetails' 
+                      fhirVersion={ this.data.fhirVersion }
+                      patient={ this.data.selectedPatient }
+                      patientId={ this.data.selectedPatientId }
+                    />
                  </Tab>
              </Tabs>
 

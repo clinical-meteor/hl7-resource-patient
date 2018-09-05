@@ -8,14 +8,14 @@ import { Table } from 'react-bootstrap';
 import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
 import { TableNoData } from 'meteor/clinical:glass-ui'
-
+import PropTypes from 'prop-types';
 
 flattenPatient = function(person){
   let result = {
     _id: person._id,
     id: person.id,
     active: person.active.toString(),
-    gender: person.gender,
+    gender: get(person, 'gender'),
     name: '',
     mrn: '',
     birthDate: '',
@@ -25,14 +25,28 @@ flattenPatient = function(person){
 
   // there's an off-by-1 error between momment() and Date() that we want
   // to account for when converting back to a string
-  result.birthDate = moment(person.birthDate).add(1, 'days').format("YYYY-MM-DD")
+  result.birthDate = moment(person.birthDate).format("YYYY-MM-DD")
   result.photo = get(person, 'photo[0].url', '');
-  result.mrn = get(person, 'identifier[0].value', '');
+  result.identifier = get(person, 'identifier[0].value', '');
 
-  if(has(person, 'name[0].text')){
+  result.maritalStatus = get(person, 'maritalStatus.text', '');
+  result.deceased = get(person, 'deceasedBoolean', '');
+  result.species = get(person, 'animal.species.text', '');
+  result.language = get(person, 'communication[0].language.text', '');
+
+  let nameText = get(person, 'name[0].text');
+  if(nameText.length > 0){
     result.name = get(person, 'name[0].text');    
   } else {
-    result.name = get(person, 'name[0].given[0]') + ' ' + get(person, 'name[0].family[0]');
+    if(get(person, 'name[0].suffix[0]')){
+      result.name = get(person, 'name[0].suffix[0]')  + ' ';
+    }
+
+    result.name = result.name + get(person, 'name[0].given[0]') + ' ' + get(person, 'name[0].family[0]');
+    
+    if(get(person, 'name[0].suffix[0]')){
+      result.name = result.name + ' ' + get(person, 'name[0].suffix[0]');
+    }
   }
 
   return result;
@@ -118,7 +132,7 @@ export class PatientTable extends React.Component {
   }
   rowClick(id){
     Session.set('patientsUpsert', false);
-    Session.set('selectedPatient', id);
+    Session.set('selectedPatientId', id);
     Session.set('patientPageTabIndex', 2);
   }
   renderRowAvatarHeader(){
@@ -137,6 +151,23 @@ export class PatientTable extends React.Component {
         </td>
       );
     }
+  }
+  renderSpeciesHeader(displaySpecies){
+    if(displaySpecies){
+      return (
+        <th className='species'>Species</th>
+      );
+    }
+  }
+  renderSpeciesRow(displaySpecies, patient){
+    if(displaySpecies){
+      return (
+        <td className='species' style={this.data.style.cellHideOnPhone}>
+          {patient.species}
+        </td>
+      );
+    }
+
   }
   renderSendButtonHeader(){
     if (this.props.showSendButton === true) {
@@ -184,7 +215,7 @@ export class PatientTable extends React.Component {
     let footer;
 
     if(this.data.patients.length === 0){
-      footer = <TableNoData noDataPadding={ this.props.noDataPadding } />
+      footer = <TableNoData noDataPadding={ this.props.noDataMessagePadding } />
     } else {
       for (var i = 0; i < this.data.patients.length; i++) {
         tableRows.push(
@@ -192,13 +223,15 @@ export class PatientTable extends React.Component {
   
             { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
   
+            <td className='identifier' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].identifier}</td>
             <td className='name' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].name }</td>
             <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
             <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
+            <td className='maritalStatus' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].maritalStatus}</td>
+            <td className='language' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].language}</td>
             <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
-            <td className='mrn' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].mrn}</td>
-            <td className='id' onClick={ this.rowClick.bind('this', this.data.patients[i].id)} style={this.data.style.cellHideOnPhone}><span className="barcode">{this.data.patients[i].id}</span></td>            
 
+              { this.renderSpeciesRow(this.props.displaySpecies, this.data.patients[i]) }
               { this.renderSendButton(this.data.patients[i], this.data.style.avatar) }
           </tr>
         );
@@ -214,13 +247,15 @@ export class PatientTable extends React.Component {
             <tr>
               { this.renderRowAvatarHeader() }
 
-              <th className='name'>name</th>
-              <th className='gender'>gender</th>
-              <th className='birthdate' style={{minWidth: '100px'}}>birthdate</th>
-              <th className='isActive' style={this.data.style.hideOnPhone}>active</th>
-              <th className='mrn' style={this.data.style.hideOnPhone}>mrn</th>
-              <th className='id' style={this.data.style.hideOnPhone}>_id</th>
+              <th className='identifier' style={this.data.style.hideOnPhone}>Identifier</th>
+              <th className='name'>Name</th>
+              <th className='gender'>Gender</th>
+              <th className='birthdate' style={{minWidth: '100px'}}>Birthdate</th>
+              <th className='maritalStatus' style={this.data.style.hideOnPhone}>Marital Status</th>
+              <th className='language' style={this.data.style.hideOnPhone}>Language</th>
+              <th className='isActive' style={this.data.style.hideOnPhone}>Active</th>
               
+              { this.renderSpeciesHeader(this.props.displaySpecies) }
               { this.renderSendButtonHeader() }
             </tr>
           </thead>
@@ -234,6 +269,13 @@ export class PatientTable extends React.Component {
   }
 }
 
+PatientTable.propTypes = {
+  id: PropTypes.string,
+  fhirVersion: PropTypes.string,
+  showSendButton: PropTypes.bool,
+  displaySpecies: PropTypes.bool,
+  noDataMessagePadding: PropTypes.number
+};
 
 ReactMixin(PatientTable.prototype, ReactMeteorData);
 export default PatientTable;
