@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '3.4.2',
+  version: '3.4.3',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -27,7 +27,7 @@ Package.onUse(function (api) {
   api.use('clinical:glass-ui@2.2.1');
   api.use('clinical:extended-api@2.2.2');
   api.use('clinical:base-model@1.4.0');
-  api.use('clinical:user-model@1.5.0');
+  api.use('clinical:user-model@1.6.2');
   api.use('matb33:collection-hooks@0.7.15');
   api.use('clinical:alert@2.1.3');
   
