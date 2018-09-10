@@ -540,11 +540,7 @@ export class PatientDetail extends React.Component {
       // not sure why we're having to respecify this; fix for a bug elsewhere
       fhirPatientData.resourceType = 'Patient';
 
-      Patients.update({_id: this.state.patientId}, {$set: fhirPatientData }, {
-        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
-        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
-        removeEmptyStrings: false
-      }, function(error, result){
+      Patients._collection.update({_id: this.state.patientId}, {$set: fhirPatientData }, function(error, result){
         if (error) {
           if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
           Bert.alert(error.reason, 'danger');
@@ -559,11 +555,7 @@ export class PatientDetail extends React.Component {
     } else {
       if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", fhirPatientData);
 
-      Patients.insert(fhirPatientData, {
-        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
-        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
-        removeEmptyStrings: false
-      },  function(error, result) {
+      Patients._collection.insert(fhirPatientData, function(error, result) {
         if (error) {
           if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
           Bert.alert(error.reason, 'danger');
