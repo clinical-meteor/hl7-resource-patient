@@ -541,8 +541,8 @@ export class PatientDetail extends React.Component {
       fhirPatientData.resourceType = 'Patient';
 
       Patients.update({_id: this.state.patientId}, {$set: fhirPatientData }, {
-        validate: false, 
-        filter: false, 
+        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
         removeEmptyStrings: false
       }, function(error, result){
         if (error) {
@@ -560,8 +560,8 @@ export class PatientDetail extends React.Component {
       if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", fhirPatientData);
 
       Patients.insert(fhirPatientData, {
-        validate: false, 
-        filter: false, 
+        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
         removeEmptyStrings: false
       },  function(error, result) {
         if (error) {
