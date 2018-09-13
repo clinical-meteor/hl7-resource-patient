@@ -576,7 +576,7 @@ export class PatientDetail extends React.Component {
 
   handleDeleteButton(){
     let self = this;
-    Patients.remove({_id: this.state.patientId}, function(error, result){
+    Patients._collection.animalremove({_id: this.state.patientId}, function(error, result){
       if (error) {
         if(process.env.NODE_ENV === "test") console.log('Patients.insert[error]', error);
         Bert.alert(error.reason, 'danger');
