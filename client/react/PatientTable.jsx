@@ -34,9 +34,9 @@ flattenPatient = function(person){
   result.species = get(person, 'animal.species.text', '');
   result.language = get(person, 'communication[0].language.text', '');
 
-  let nameText = get(person, 'name[0].text');
+  let nameText = get(person, 'name[0].text', '');
   if(nameText.length > 0){
-    result.name = get(person, 'name[0].text');    
+    result.name = get(person, 'name[0].text', '');    
   } else {
     if(get(person, 'name[0].suffix[0]')){
       result.name = get(person, 'name[0].suffix[0]')  + ' ';
