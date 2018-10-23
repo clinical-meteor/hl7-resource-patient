@@ -14,7 +14,7 @@ flattenPatient = function(person){
   let result = {
     _id: person._id,
     id: person.id,
-    active: person.active.toString(),
+    active: true,
     gender: get(person, 'gender'),
     name: '',
     mrn: '',
@@ -22,6 +22,8 @@ flattenPatient = function(person){
     photo: "/thumbnail-blank.png",
     initials: 'abc'
   };
+
+  result.active = get(person, 'active', true).toString();
 
   // there's an off-by-1 error between momment() and Date() that we want
   // to account for when converting back to a string
