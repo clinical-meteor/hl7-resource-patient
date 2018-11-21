@@ -205,7 +205,7 @@ export class PatientDetail extends React.Component {
                 floatingLabelText='Prefix'
                 value={ get(formData, 'prefix', '')}
                 onChange={ this.changeState.bind(this, 'prefix')}
-                hintText='Dr.'
+                hintText=''
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
@@ -243,7 +243,7 @@ export class PatientDetail extends React.Component {
                 ref='suffix'
                 name='suffix'
                 floatingLabelText='Suffix / Maiden'
-                hintText='-McDonald'
+                hintText=''
                 value={ get(formData, 'suffix', '')}
                 onChange={ this.changeState.bind(this, 'suffix')}
                 floatingLabelFixed={true}
