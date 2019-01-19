@@ -145,7 +145,8 @@ export class PatientTable extends React.Component {
     }
   }
   renderRowAvatar(patient, avatarStyle){
-    console.log('renderRowAvatar', patient, avatarStyle)
+    //console.log('renderRowAvatar', patient, avatarStyle)
+    
     if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
       return (
         <td className='avatar'>
