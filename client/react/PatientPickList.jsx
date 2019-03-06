@@ -33,6 +33,7 @@ export class PatientPickList extends React.Component {
     Session.set(variable, value);
   }
   handleOpenPatients(){
+    console.log('handleOpenPatients')
     Session.set('patientDialogOpen', true);
   }  
   handleClosePatients(){

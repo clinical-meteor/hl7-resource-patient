@@ -1,4 +1,5 @@
-import Avatar from 'material-ui/Avatar';
+import { Card, CardActions, CardMedia, CardText, CardTitle, Toggle } from 'material-ui';
+
 import FlatButton from 'material-ui/FlatButton';
 import { HTTP } from 'meteor/http';
 import React from 'react';
@@ -9,6 +10,8 @@ import { Session } from 'meteor/session';
 import { has, get } from 'lodash';
 import { TableNoData } from 'meteor/clinical:glass-ui'
 import PropTypes from 'prop-types';
+
+import { FaTags, FaCode, FaPuzzlePiece, FaLock  } from 'react-icons/fa';
 
 flattenPatient = function(person){
   let result = {
@@ -213,6 +216,43 @@ export class PatientTable extends React.Component {
       this.props.onRowClick(patientId);
     }
   }
+  renderToggleHeader(){
+    if (!this.props.hideToggle) {
+      return (
+        <th className="toggle">Toggle</th>
+      );
+    }
+  }
+  renderToggle(){
+    if (!this.props.hideToggle) {
+      return (
+        <td className="toggle" style={{width: '60px'}}>
+            <Toggle
+              defaultToggled={true}
+            />
+          </td>
+      );
+    }
+  }
+  renderActionIconsHeader(){
+    if (!this.props.hideActionIcons) {
+      return (
+        <th className='actionIcons' style={{minWidth: '120px'}}>Actions</th>
+      );
+    }
+  }
+  renderActionIcons(actionIcons ){
+    if (!this.props.hideActionIcons) {
+      return (
+        <td className='actionIcons' style={{minWidth: '120px'}}>
+          <FaLock style={{marginLeft: '2px', marginRight: '2px'}} />
+          <FaTags style={{marginLeft: '2px', marginRight: '2px'}} />
+          <FaCode style={{marginLeft: '2px', marginRight: '2px'}} />
+          <FaPuzzlePiece style={{marginLeft: '2px', marginRight: '2px'}} />          
+        </td>
+      );
+    }
+  } 
   render () {
     let tableRows = [];
     let footer;
@@ -224,6 +264,9 @@ export class PatientTable extends React.Component {
         tableRows.push(
           <tr key={i} className="patientRow" style={{cursor: "pointer"}} onClick={this.selectPatientRow.bind(this, this.data.patients[i].id )} >
   
+            { this.renderToggle(this.data.patients[i]) }
+            { this.renderActionIcons(this.data.patients[i]) }
+
             { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
   
             <td className='identifier' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].identifier}</td>
@@ -248,8 +291,10 @@ export class PatientTable extends React.Component {
         <Table id='patientsTable' hover >
           <thead>
             <tr>
+              { this.renderToggleHeader() }
+              { this.renderActionIconsHeader() }
               { this.renderRowAvatarHeader() }
-
+  
               <th className='identifier' style={this.data.style.hideOnPhone}>Identifier</th>
               <th className='name'>Name</th>
               <th className='gender'>Gender</th>
@@ -277,6 +322,8 @@ PatientTable.propTypes = {
   fhirVersion: PropTypes.string,
   showSendButton: PropTypes.bool,
   displaySpecies: PropTypes.bool,
+  hideToggle: PropTypes.bool,
+  hideActionIcons: PropTypes.bool,
   noDataMessagePadding: PropTypes.number
 };
 

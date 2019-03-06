@@ -6,6 +6,7 @@ import { GlassCard, Glass, DynamicSpacer } from 'meteor/clinical:glass-ui';
 import { Card, CardActions, CardHeader, CardText, CardTitle } from 'material-ui/Card';
 import { Col, Grid, Row } from 'react-bootstrap';
 import TextField from 'material-ui/TextField';
+import PropTypes from 'prop-types';
 
 import { get } from 'lodash';
 
@@ -157,5 +158,14 @@ export class PatientCard extends React.Component {
 }
 
 
-
+PatientCard.propTypes = {
+  multiline: PropTypes.bool,
+  fullName: PropTypes.string,
+  familyName: PropTypes.string,
+  givenName: PropTypes.string,
+  email: PropTypes.string,
+  birthdate: PropTypes.string,
+  gender: PropTypes.string,
+  avatar: PropTypes.string
+};
 export default PatientCard ;

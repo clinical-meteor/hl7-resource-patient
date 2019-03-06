@@ -12,7 +12,7 @@ import {PatientTable as PatientsTable} from './client/react/PatientTable';
 import PatientDetail from './client/react/PatientDetail';
 import PatientCard from './client/react/PatientCard';
 
-import { Patient, Patients, PatientSchema } from './lib/Patients';
+import { Patient, Patients, PatientSchema, PatientDstu2, PatientStu3 } from './lib/Patients';
 
 var DynamicRoutes = [{
   'name': 'PatientPage',
@@ -41,7 +41,9 @@ export {
 
   Patient,
   Patients,
-  PatientSchema
+  PatientSchema,
+  PatientDstu2, 
+  PatientStu3
 };
 
 
