@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '3.4.23',
+  version: '3.4.27',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -24,7 +24,7 @@ Package.onUse(function (api) {
   api.use('http');
   api.use('react-meteor-data@0.2.15');
 
-  api.use('clinical:glass-ui@2.4.6');
+  api.use('clinical:glass-ui@2.4.7');
   api.use('clinical:extended-api@2.4.0');
   api.use('clinical:base-model@1.4.0');
   api.use('clinical:user-model@1.6.2');
@@ -56,6 +56,7 @@ Package.onUse(function (api) {
 Npm.depends({
   "simpl-schema": "1.5.3",
   "moment": "2.22.2",
+  "validator": "10.9.0",
   "lodash": "4.17.4"
 })
 

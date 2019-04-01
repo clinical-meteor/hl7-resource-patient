@@ -253,6 +253,36 @@ export class PatientTable extends React.Component {
       );
     }
   } 
+
+  renderMaritalStatusHeader(){
+    if (!this.props.hideMaritalStatus) {
+      return (
+        <th className="maritalStatus">Marital Status</th>
+      );
+    }
+  }
+  renderMaritalStatus(patient){
+    if (!this.props.hideMaritalStatus) {
+      return (
+        <td className='maritalStatus'>{patient.maritalStatus}</td>
+      );
+    }
+  }
+
+  renderLanguageHeader(){
+    if (!this.props.hideLanguage) {
+      return (
+        <th className="language">Language</th>
+      );
+    }
+  }
+  renderLanguage(patient){
+    if (!this.props.hideLanguage) {
+      return (
+        <td className='language'>{patient.language}</td>
+      );
+    }
+  }
   render () {
     let tableRows = [];
     let footer;
@@ -273,8 +303,12 @@ export class PatientTable extends React.Component {
             <td className='name' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].name }</td>
             <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
             <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
-            <td className='maritalStatus' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].maritalStatus}</td>
-            <td className='language' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].language}</td>
+
+            { this.renderMaritalStatus(this.data.patients[i]) }
+            { this.renderLanguage(this.data.patients[i]) }
+
+            {/* <td className='maritalStatus' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].maritalStatus}</td> */}
+            {/* <td className='language' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].language}</td> */}
             <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
 
               { this.renderSpeciesRow(this.props.displaySpecies, this.data.patients[i]) }
@@ -299,8 +333,12 @@ export class PatientTable extends React.Component {
               <th className='name'>Name</th>
               <th className='gender'>Gender</th>
               <th className='birthdate' style={{minWidth: '100px'}}>Birthdate</th>
-              <th className='maritalStatus' style={this.data.style.hideOnPhone}>Marital Status</th>
-              <th className='language' style={this.data.style.hideOnPhone}>Language</th>
+
+              { this.renderMaritalStatusHeader(this.data.patients[i]) }
+              { this.renderLanguageHeader(this.data.patients[i]) }
+
+              {/* <th className='maritalStatus' style={this.data.style.hideOnPhone}>Marital Status</th> */}
+              {/* <th className='language' style={this.data.style.hideOnPhone}>Language</th> */}
               <th className='isActive' style={this.data.style.hideOnPhone}>Active</th>
               
               { this.renderSpeciesHeader(this.props.displaySpecies) }
@@ -322,8 +360,11 @@ PatientTable.propTypes = {
   fhirVersion: PropTypes.string,
   showSendButton: PropTypes.bool,
   displaySpecies: PropTypes.bool,
+  onRowClick: PropTypes.func,
   hideToggle: PropTypes.bool,
   hideActionIcons: PropTypes.bool,
+  hideMaritalStatus: PropTypes.bool,
+  hideLanguage: PropTypes.bool,
   noDataMessagePadding: PropTypes.number
 };
 

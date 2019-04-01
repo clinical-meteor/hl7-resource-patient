@@ -74,6 +74,9 @@ export class PatientDetail extends React.Component {
         maritalStatus: {
           text: ''
         },
+        telecom: [{
+          use: "phone"
+        }],
         contact: [],
         animal: {
           species: {
@@ -123,6 +126,7 @@ export class PatientDetail extends React.Component {
     formData.species = get(patient, 'animal.species.text')
     formData.language = get(patient, 'communication[0].language.text')
     formData.birthDate = moment(patient.birthDate).format("YYYY-MM-DD")
+    formData.smartphone = get(patient, 'telecom[0].value')
 
     return formData;
   }
@@ -347,6 +351,21 @@ export class PatientDetail extends React.Component {
                 /><br/>
             </Col>
           </Row>
+          <Row>
+            <Col md={6}>
+              <TextField
+                id='smartphoneInput'
+                ref='smartphone'
+                name='smartphone'
+                floatingLabelText='Phone'
+                hintText='773-555-1234'
+                value={ get(formData, 'smartphone', '')}
+                onChange={ this.changeState.bind(this, 'smartphone')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/>
+            </Col>
+          </Row>
 
 
         </CardText>
@@ -444,6 +463,9 @@ export class PatientDetail extends React.Component {
       case "birthDate":
         set(formData, 'birthDate', textValue)
         break;
+      case "smartphone":
+        set(formData, 'smartphone', textValue)
+        break;
       default:
     }
 
@@ -489,6 +511,9 @@ export class PatientDetail extends React.Component {
         break;  
       case "photo":
         set(patientData, 'photo[0].url', textValue)
+        break;
+      case "smartphone":
+        set(patientData, 'telecom[0].value', textValue)
         break;
       case "birthDate":
         set(patientData, 'birthDate', textValue)
