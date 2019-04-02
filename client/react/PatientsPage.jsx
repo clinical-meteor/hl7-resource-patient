@@ -86,8 +86,6 @@ export class PatientsPage extends React.Component {
                  </Tab>
                  <Tab className="patientListTab" label='Patients' onActive={this.handleActive} style={this.data.style.tab} value={1}>
                    <PatientTable 
-                      showBarcodes={true} 
-                      showAvatars={true} 
                       noDataMessagePadding={100}
                       />
                  </Tab>

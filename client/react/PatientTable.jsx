@@ -129,7 +129,7 @@ export class PatientTable extends React.Component {
       data.style.cellHideOnPhone.display = 'table-cell';
     }
 
-    // console.log("PatientTable[data]", data);
+    console.log("PatientTable[data]", data);
     return data;
   }
   imgError(avatarId) {
@@ -211,9 +211,15 @@ export class PatientTable extends React.Component {
       }
     });
   }
-  selectPatientRow(patientId){
-    if(typeof(this.props.onRowClick) === "function"){
+  selectPatientRow(patientId, foo, bar){
+    console.log('Selecting a new Patient...');
+    console.log('patientId', patientId, foo, bar)
+    if(typeof this.props.onRowClick === "function"){
+      console.log('Apparently we received an onRowClick() as a prop')
       this.props.onRowClick(patientId);
+    } else {
+      Session.set('selectedPatientId', patientId);
+      Session.set('selectedPatient', Patients.findOne(patientId));
     }
   }
   renderToggleHeader(){
@@ -292,7 +298,7 @@ export class PatientTable extends React.Component {
     } else {
       for (var i = 0; i < this.data.patients.length; i++) {
         tableRows.push(
-          <tr key={i} className="patientRow" style={{cursor: "pointer"}} onClick={this.selectPatientRow.bind(this, this.data.patients[i].id )} >
+          <tr key={i} className="patientRow" style={{cursor: "pointer"}} onClick={this.selectPatientRow.bind(this, this.data.patients[i]._id )} >
   
             { this.renderToggle(this.data.patients[i]) }
             { this.renderActionIcons(this.data.patients[i]) }
@@ -357,6 +363,7 @@ export class PatientTable extends React.Component {
 
 PatientTable.propTypes = {
   id: PropTypes.string,
+  data: PropTypes.array,
   fhirVersion: PropTypes.string,
   showSendButton: PropTypes.bool,
   displaySpecies: PropTypes.bool,
@@ -365,7 +372,7 @@ PatientTable.propTypes = {
   hideActionIcons: PropTypes.bool,
   hideMaritalStatus: PropTypes.bool,
   hideLanguage: PropTypes.bool,
-  noDataMessagePadding: PropTypes.number
+  noDataMessagePadding: PropTypes.number  
 };
 
 ReactMixin(PatientTable.prototype, ReactMeteorData);
