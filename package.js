@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '3.4.29',
+  version: '3.4.30',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -37,7 +37,6 @@ Package.onUse(function (api) {
 
   api.addFiles('server/methods.js', 'server');
   api.addFiles('server/rest.js', 'server');
-  // api.addFiles('server/hooks.patients.js', 'server');
 
   if(Package['clinical:fhir-vault-server']){
     api.use('clinical:fhir-vault-server@0.0.3', ['client', 'server'], {weak: true});

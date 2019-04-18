@@ -12,6 +12,7 @@ import { TableNoData } from 'meteor/clinical:glass-ui'
 import PropTypes from 'prop-types';
 
 import { FaTags, FaCode, FaPuzzlePiece, FaLock  } from 'react-icons/fa';
+import { GoTrashcan } from 'react-icons/go'
 
 flattenPatient = function(person){
   let result = {
@@ -247,14 +248,19 @@ export class PatientTable extends React.Component {
       );
     }
   }
-  renderActionIcons(actionIcons ){
+  renderActionIcons(patient ){
     if (!this.props.hideActionIcons) {
+      let iconStyle = {
+        marginLeft: '4px', 
+        marginRight: '4px', 
+        marginTop: '4px', 
+        fontSize: '120%'
+      }
+
       return (
         <td className='actionIcons' style={{minWidth: '120px'}}>
-          <FaLock style={{marginLeft: '2px', marginRight: '2px'}} />
-          <FaTags style={{marginLeft: '2px', marginRight: '2px'}} />
-          <FaCode style={{marginLeft: '2px', marginRight: '2px'}} />
-          <FaPuzzlePiece style={{marginLeft: '2px', marginRight: '2px'}} />          
+          <FaTags style={iconStyle} onClick={this.showSecurityDialog.bind(this, patient)} />
+          <GoTrashcan style={iconStyle} onClick={this.removeRecord.bind(this, patient._id)} />  
         </td>
       );
     }
@@ -289,6 +295,18 @@ export class PatientTable extends React.Component {
       );
     }
   }
+  removeRecord(_id){
+    console.log('Remove patient ', _id)
+    Patients._collection.remove({_id: _id})
+  }
+  showSecurityDialog(patient){
+    console.log('showSecurityDialog', patient)
+
+    Session.set('securityDialogResourceJson', Patients.findOne(get(patient, '_id')));
+    Session.set('securityDialogResourceType', 'Goal');
+    Session.set('securityDialogResourceId', get(patient, '_id'));
+    Session.set('securityDialogOpen', true);
+  }
   render () {
     let tableRows = [];
     let footer;
@@ -297,8 +315,16 @@ export class PatientTable extends React.Component {
       footer = <TableNoData noDataPadding={ this.props.noDataMessagePadding } />
     } else {
       for (var i = 0; i < this.data.patients.length; i++) {
+
+        let rowStyle = {
+          cursor: 'pointer'
+        }
+        if(get(this.data.patients[i], 'modifierExtension[0].valueBoolean') === true){
+          rowStyle.color = "orange";
+        }
+
         tableRows.push(
-          <tr key={i} className="patientRow" style={{cursor: "pointer"}} onClick={this.selectPatientRow.bind(this, this.data.patients[i]._id )} >
+          <tr key={i} className="patientRow" style={rowStyle} onClick={this.selectPatientRow.bind(this, this.data.patients[i]._id )} >
   
             { this.renderToggle(this.data.patients[i]) }
             { this.renderActionIcons(this.data.patients[i]) }
