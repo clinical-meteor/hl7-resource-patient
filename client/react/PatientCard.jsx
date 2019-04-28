@@ -9,6 +9,7 @@ import TextField from 'material-ui/TextField';
 import PropTypes from 'prop-types';
 
 import { get } from 'lodash';
+import moment from 'moment';
 
 const style = {
     avatar: {
@@ -48,7 +49,7 @@ export class PatientCard extends React.Component {
   }
   render(){
     // console.log('&&&&&&&&&&&&&&&&&&&')
-    // console.log('PatientCard', this.props)
+    console.log('PatientCard.render', this.props)
 
     let { active, familyName, givenName, fullName, email, birthdate, gender, avatar, patient, zDepth, overflowY, ...otherProps } = this.props;
 
@@ -111,7 +112,7 @@ export class PatientCard extends React.Component {
                         type='date'
                         floatingLabelText='date of birth'
                         floatingLabelFixed={true}
-                        value={ birthdate }                          
+                        value={ moment(birthdate).format('YYYY-MM-DD') }                          
                         onChange={ this.props.updateBirthdate ? this.props.updateBirthdate.bind(this) : null }
                         fullWidth
                         /><br/>
