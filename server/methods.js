@@ -4,7 +4,7 @@ Meteor.methods({
   createPatient:function(patientObject){
     check(patientObject, Object);
 
-    if (this.userId) {
+    if (process.env.NIGHTWATCH || this.userId) {
       console.log('-----------------------------------------');
       console.log('Creating Patient...');
       Patients.insert(patientObject, function(error, result){
@@ -32,11 +32,11 @@ Meteor.methods({
         }
       });
     } else {
-        console.log('User not logged int.  Skipping.');
+      console.log('Not authorized.  Try logging in or setting NIGHTWATCH=true')
     }  
   },
   initializePatient:function(){
-    if(this.userId){
+    if (process.env.NIGHTWATCH || this.userId) {
         console.log('-----------------------------------------');
         console.log('No records found in Patients collection.  Lets create some...');
     
@@ -72,17 +72,19 @@ Meteor.methods({
     
         Meteor.call('createPatient', defaultPatient);
     } else {
-        console.log('User not logged int.  Skipping.');
+      console.log('Not authorized.  Try logging in or setting NIGHTWATCH=true')
     }  
   },
   'Patients/drop': function(){
     console.log('-----------------------------------------');
     console.log('Dropping patients... ');
 
-    if(this.userId){
+    if (process.env.NIGHTWATCH || this.userId) {
         Patients.find().forEach(function(patient){
             Patients.remove({_id: patient._id});
         });    
+    } else {
+      console.log('Not authorized.  Try logging in or setting NIGHTWATCH=true')
     }
   }
 });

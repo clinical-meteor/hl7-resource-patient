@@ -226,7 +226,7 @@ export class PatientTable extends React.Component {
   renderToggleHeader(){
     if (!this.props.hideToggle) {
       return (
-        <th className="toggle">Toggle</th>
+        <th className="toggle" style={{width: '60px'}} >Toggle</th>
       );
     }
   }
@@ -303,7 +303,7 @@ export class PatientTable extends React.Component {
     console.log('showSecurityDialog', patient)
 
     Session.set('securityDialogResourceJson', Patients.findOne(get(patient, '_id')));
-    Session.set('securityDialogResourceType', 'Goal');
+    Session.set('securityDialogResourceType', 'Patient');
     Session.set('securityDialogResourceId', get(patient, '_id'));
     Session.set('securityDialogOpen', true);
   }
@@ -319,7 +319,7 @@ export class PatientTable extends React.Component {
         let rowStyle = {
           cursor: 'pointer'
         }
-        if(get(this.data.patients[i], 'modifierExtension[0].valueBoolean') === true){
+        if(get(this.data.patients[i], 'modifierExtension[0]')){
           rowStyle.color = "orange";
         }
 
