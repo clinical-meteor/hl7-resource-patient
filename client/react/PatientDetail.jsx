@@ -1,15 +1,10 @@
 import { CardActions, CardText, DatePicker, Toggle, RaisedButton, TextField } from 'material-ui';
-import { get, has, set } from 'lodash';
+import { get, set } from 'lodash';
 import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 
 import React from 'react';
-import { ReactMeteorData } from 'meteor/react-meteor-data';
-import ReactMixin from 'react-mixin';
 import PropTypes from 'prop-types';
-
-import { Meteor } from 'meteor/meteor';
-import { Session } from 'meteor/session';
 
 
 const styles = {
@@ -18,22 +13,7 @@ const styles = {
   },
   toggle: {
     marginTop: 16,
-  },
-  thumbOff: {
-    backgroundColor: '#ffcccc',
-  },
-  trackOff: {
-    backgroundColor: '#ff9d9d',
-  },
-  thumbSwitched: {
-    backgroundColor: 'red',
-  },
-  trackSwitched: {
-    backgroundColor: '#ff9d9d',
-  },
-  labelStyle: {
-    color: 'red',
-  },
+  }
 };
 
 export class PatientDetail extends React.Component {
@@ -152,24 +132,6 @@ export class PatientDetail extends React.Component {
  
     return shouldUpdate;
   }
-  getMeteorData() {
-    let data = {
-      patientId: this.props.patientId,
-      patient: false,
-      form: this.state.form
-    };
-
-    if(this.props.patient){
-      data.patient = this.props.patient;
-    }
-    if(this.props.displayBirthdate){
-      data.displayBirthdate = this.props.displayBirthdate;
-    }
-
-    if(process.env.NODE_ENV === "test") console.log("PatientDetail[data]", data);
-    return data;
-  }
-
   render() {
     if(process.env.NODE_ENV === "test") console.log('PatientDetail.render()', this.state)
     let formData = this.state.form;
@@ -370,7 +332,7 @@ export class PatientDetail extends React.Component {
 
         </CardText>
         <CardActions>
-          { this.determineButtons(this.data.patientId) }
+          { this.determineButtons(this.state.patientId) }
         </CardActions>
       </div>
     );
@@ -542,78 +504,25 @@ export class PatientDetail extends React.Component {
 
   // this could be a mixin
   handleSaveButton(){
-    if(process.env.NODE_ENV === "test") console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&&')
-    console.log('Saving a new Patient...', this.state)
-
+    //console.log('handleSaveButton')
     let self = this;
-    let fhirPatientData = Object.assign({}, this.state.patient);
-
-    if(process.env.NODE_ENV === "test") console.log('fhirPatientData', fhirPatientData);
-
-
-    let patientValidator = PatientSchema.newContext();
-    console.log('patientValidator', patientValidator)
-    patientValidator.validate(fhirPatientData)
-
-    console.log('IsValid: ', patientValidator.isValid())
-    // console.log('ValidationErrors: ', patientValidator.validationErrors());
-
-    if (this.state.patientId) {
-      if(process.env.NODE_ENV === "test") console.log("Updating patient...");
-
-      delete fhirPatientData._id;
-
-      // not sure why we're having to respecify this; fix for a bug elsewhere
-      fhirPatientData.resourceType = 'Patient';
-
-      Patients._collection.update({_id: this.state.patientId}, {$set: fhirPatientData }, function(error, result){
-        if (error) {
-          if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
-          Bert.alert(error.reason, 'danger');
-        }
-        if (result) {
-          HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: self.state.patientId});
-          Session.set('selectedPatientId', false);
-          Session.set('patientPageTabIndex', 1);
-          Bert.alert('Patient added!', 'success');
-        }
-      });
-    } else {
-      if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", fhirPatientData);
-
-      Patients._collection.insert(fhirPatientData, function(error, result) {
-        if (error) {
-          if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
-          Bert.alert(error.reason, 'danger');
-        }
-        if (result) {
-          HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: self.state.patientId});
-          Session.set('patientPageTabIndex', 1);
-          Session.set('selectedPatientId', false);
-          Bert.alert('Patient added!', 'success');
-        }
-      });
+    if(this.props.onUpsert){
+      this.props.onUpsert(self);
     }
   }
 
   handleCancelButton(){
-    Session.set('patientPageTabIndex', 1);
+    let self = this;
+    if(this.props.onCancel){
+      this.props.onCancel(self);
+    }
   }
 
   handleDeleteButton(){
     let self = this;
-    Patients._collection.animalremove({_id: this.state.patientId}, function(error, result){
-      if (error) {
-        if(process.env.NODE_ENV === "test") console.log('Patients.insert[error]', error);
-        Bert.alert(error.reason, 'danger');
-      }
-      if (result) {
-        HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: self.state.patientId});
-        Session.set('patientPageTabIndex', 1);
-        Session.set('selectedPatientId', false);
-        Bert.alert('Patient removed!', 'success');
-      }
-    });
+    if(this.props.onDelete){
+      this.props.onDelete(self);
+    }
   }
 }
 
@@ -621,7 +530,10 @@ PatientDetail.propTypes = {
   id: PropTypes.string,
   fhirVersion: PropTypes.string,
   patientId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  patient: PropTypes.oneOfType([PropTypes.object, PropTypes.bool])
+  patient: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  onDelete: PropTypes.func,
+  onUpsert: PropTypes.func,
+  onSave: PropTypes.func,
+  onCancel: PropTypes.func
 };
-ReactMixin(PatientDetail.prototype, ReactMeteorData);
 export default PatientDetail;

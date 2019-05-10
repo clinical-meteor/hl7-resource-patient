@@ -1,18 +1,39 @@
-import { Card, CardActions, CardMedia, CardText, CardTitle, Toggle } from 'material-ui';
+import { FlatButton, Toggle } from 'material-ui';
 
-import FlatButton from 'material-ui/FlatButton';
-import { HTTP } from 'meteor/http';
 import React from 'react';
-import { ReactMeteorData } from 'meteor/react-meteor-data';
-import ReactMixin from 'react-mixin';
 import { Table } from 'react-bootstrap';
-import { Session } from 'meteor/session';
-import { has, get } from 'lodash';
-import { TableNoData } from 'meteor/clinical:glass-ui'
+
+import { TableNoData } from './TableNoData'
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 
 import { FaTags, FaCode, FaPuzzlePiece, FaLock  } from 'react-icons/fa';
 import { GoTrashcan } from 'react-icons/go'
+
+let styles = {
+  hideOnPhone: {
+    visibility: 'visible',
+    display: 'table'
+  },
+  cellHideOnPhone: {
+    visibility: 'visible',
+    display: 'table',
+    paddingTop: '16px',
+    maxWidth: '120px'
+  },
+  cell: {
+    paddingTop: '16px'
+  },
+  avatar: {
+    // color: rgb(255, 255, 255);
+    backgroundColor: 'rgb(188, 188, 188)',
+    userSelect: 'none',
+    borderRadius: '2px',
+    height: '40px',
+    width: '40px'
+  }
+},
+
 
 flattenPatient = function(person){
   let result = {
@@ -61,85 +82,13 @@ flattenPatient = function(person){
 export class PatientTable extends React.Component {
   constructor(props) {
     super(props);
-  }
-  getMeteorData() {
-    let data = {
-      style: {
-        hideOnPhone: {
-          visibility: 'visible',
-          display: 'table'
-        },
-        cellHideOnPhone: {
-          visibility: 'visible',
-          display: 'table',
-          paddingTop: '16px',
-          maxWidth: '120px'
-        },
-        cell: {
-          paddingTop: '16px'
-        },
-        avatar: {
-          // color: rgb(255, 255, 255);
-          backgroundColor: 'rgb(188, 188, 188)',
-          userSelect: 'none',
-          borderRadius: '2px',
-          height: '40px',
-          width: '40px'
-        }
-      },
+    this.state = {
       selected: [],
       patients: []
-    };
-
-    let query = {};
-    let options = {};
-
-    // number of items in the table should be set globally
-    if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
-      options.limit = get(Meteor, 'settings.public.defaults.paginationLimit');
     }
-    // but can be over-ridden by props being more explicit
-    if(this.props.limit){
-      options.limit = this.props.limit;      
-    }
-
-    if(this.props.data){
-      // console.log('this.props.data', this.props.data);
-
-      if(this.props.data.length > 0){              
-        this.props.data.forEach(function(patient){
-          data.patients.push(flattenPatient(patient));
-        });  
-      }
-    } else {
-      data.patients = Patients.find().map(function(patient){
-        return flattenPatient(patient);
-      });
-    }
-
-
-    if (Session.get('appWidth') < 768) {
-      data.style.hideOnPhone.visibility = 'hidden';
-      data.style.hideOnPhone.display = 'none';
-      data.style.cellHideOnPhone.visibility = 'hidden';
-      data.style.cellHideOnPhone.display = 'none';
-    } else {
-      data.style.hideOnPhone.visibility = 'visible';
-      data.style.hideOnPhone.display = 'table-cell';
-      data.style.cellHideOnPhone.visibility = 'visible';
-      data.style.cellHideOnPhone.display = 'table-cell';
-    }
-
-    console.log("PatientTable[data]", data);
-    return data;
   }
   imgError(avatarId) {
     this.refs[avatarId].src = Meteor.absoluteUrl() + 'noAvatar.png';
-  }
-  rowClick(id){
-    Session.set('patientsUpsert', false);
-    Session.set('selectedPatientId', id);
-    Session.set('patientPageTabIndex', 2);
   }
   renderRowAvatarHeader(){
     if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
@@ -159,68 +108,70 @@ export class PatientTable extends React.Component {
       );
     }
   }
-  renderSpeciesHeader(displaySpecies){
-    if(displaySpecies){
+  renderIdentifier(identifier){
+    if (!this.props.hideIdentifier) {
+      return (
+        <td className="identifier hidden-on-phone">{ identifier }</td>
+      );
+    }
+  }
+  renderIdentifierHeader(){
+    if (!this.props.hideIdentifier) {
+      return (
+        <th className="identifier hidden-on-phone">identifier</th>
+      );
+    }
+  }
+
+  renderSpeciesHeader(hideSpecies){
+    if(hideSpecies){
       return (
         <th className='species'>Species</th>
       );
     }
   }
-  renderSpeciesRow(displaySpecies, patient){
-    if(displaySpecies){
+  renderSpeciesRow(hideSpecies, patient){
+    if(hideSpecies){
       return (
-        <td className='species' style={this.data.style.cellHideOnPhone}>
+        <td className='species' style={styles.cellHideOnPhone}>
           {patient.species}
         </td>
       );
     }
 
   }
-  renderSendButtonHeader(){
-    if (this.props.showSendButton === true) {
+  renderActionButtonHeader(){
+    if (this.props.showActionButton === true) {
       return (
-        <th className='sendButton' style={this.data.style.hideOnPhone}></th>
+        <th className='ActionButton' style={styles.hideOnPhone}></th>
       );
     }
   }
-  renderSendButton(patient, avatarStyle){
-    if (this.props.showSendButton === true) {
+  renderActionButton(patient, avatarStyle){
+    if (this.props.showActionButton === true) {
       return (
-        <td className='sendButton' style={this.data.style.hideOnPhone}>
-          <FlatButton label="send" onClick={this.onSend.bind('this', this.data.patients[i]._id)}/>
+        <td className='ActionButton' style={styles.hideOnPhone}>
+          <FlatButton label="send" onClick={this.onActionButtonClick.bind('this', patientsToRender[i]._id)}/>
         </td>
       );
     }
   }
-  onSend(id){
-    let patient = Patients.findOne({_id: id});
-
-    console.log("PatientTable.onSend()", patient);
-
-    var httpEndpoint = "http://localhost:8080";
-    if (get(Meteor, 'settings.public.interfaces.default.channel.endpoint')) {
-      httpEndpoint = get(Meteor, 'settings.public.interfaces.default.channel.endpoint');
+  onActionButtonClick(id){
+    if(typeof this.props.onActionButtonClick === "function"){
+      this.props.onActionButtonClick(id);
     }
-    HTTP.post(httpEndpoint + '/Patient', {
-      data: patient
-    }, function(error, result){
-      if (error) {
-        console.log("error", error);
-      }
-      if (result) {
-        console.log("result", result);
-      }
-    });
   }
-  selectPatientRow(patientId, foo, bar){
+  cellClick(id){
+    if(typeof this.props.onCellClick === "function"){
+      this.props.onCellClick(id);
+    }
+  }
+  selectPatientRow(patientId){
     console.log('Selecting a new Patient...');
-    console.log('patientId', patientId, foo, bar)
-    if(typeof this.props.onRowClick === "function"){
+    // console.log('patientId', patientId, foo, bar)
+    if(typeof this.props.onRowClick  === "function"){
       console.log('Apparently we received an onRowClick() as a prop')
       this.props.onRowClick(patientId);
-    } else {
-      Session.set('selectedPatientId', patientId);
-      Session.set('selectedPatient', Patients.findOne(patientId));
     }
   }
   renderToggleHeader(){
@@ -295,6 +246,20 @@ export class PatientTable extends React.Component {
       );
     }
   }
+  renderIsActiveHeader(){
+    if (!this.props.hideActive) {
+      return (
+        <th className="isActive">Active</th>
+      );
+    }
+  }
+  renderIsActive(isActive){
+    if (!this.props.hideActive) {
+      return (
+        <td className='isActive'>{isActive}</td>
+      );
+    }
+  }
   removeRecord(_id){
     console.log('Remove patient ', _id)
     Patients._collection.remove({_id: _id})
@@ -311,40 +276,60 @@ export class PatientTable extends React.Component {
     let tableRows = [];
     let footer;
 
-    if(this.data.patients.length === 0){
+    if(this.props.appWidth){
+      if (this.props.appWidth < 768) {
+        styles.hideOnPhone.visibility = 'hidden';
+        styles.hideOnPhone.display = 'none';
+        styles.cellHideOnPhone.visibility = 'hidden';
+        styles.cellHideOnPhone.display = 'none';
+      } else {
+        styles.hideOnPhone.visibility = 'visible';
+        styles.hideOnPhone.display = 'table-cell';
+        styles.cellHideOnPhone.visibility = 'visible';
+        styles.cellHideOnPhone.display = 'table-cell';
+      }  
+    }
+
+    let patientsToRender = [];
+    if(this.props.patients){
+      if(this.props.patients.length > 0){              
+        this.props.patients.forEach(function(patient){
+          patientsToRender.push(flattenPatient(patient));
+        });  
+      }
+    }
+
+    if(patientsToRender.length === 0){
       footer = <TableNoData noDataPadding={ this.props.noDataMessagePadding } />
     } else {
-      for (var i = 0; i < this.data.patients.length; i++) {
+      for (var i = 0; i < patientsToRender.length; i++) {
 
         let rowStyle = {
           cursor: 'pointer'
         }
-        if(get(this.data.patients[i], 'modifierExtension[0]')){
+        if(get(patientsToRender[i], 'modifierExtension[0]')){
           rowStyle.color = "orange";
         }
 
         tableRows.push(
-          <tr key={i} className="patientRow" style={rowStyle} onClick={this.selectPatientRow.bind(this, this.data.patients[i]._id )} >
+          <tr key={i} className="patientRow" style={rowStyle} onClick={this.selectPatientRow.bind(this, patientsToRender[i]._id )} >
   
-            { this.renderToggle(this.data.patients[i]) }
-            { this.renderActionIcons(this.data.patients[i]) }
+            { this.renderToggle(patientsToRender[i]) }
+            { this.renderActionIcons(patientsToRender[i]) }
 
-            { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
-  
-            <td className='identifier' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].identifier}</td>
-            <td className='name' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].name }</td>
-            <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
-            <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
+            { this.renderRowAvatar(patientsToRender[i], styles.avatar) }
+            { this.renderIdentifier(patientsToRender[i].identifier)}
 
-            { this.renderMaritalStatus(this.data.patients[i]) }
-            { this.renderLanguage(this.data.patients[i]) }
+            <td className='name' onClick={ this.cellClick.bind(this, patientsToRender[i]._id)} style={styles.cell}>{patientsToRender[i].name }</td>
+            <td className='gender' onClick={ this.cellClick.bind(this, patientsToRender[i]._id)} style={styles.cell}>{patientsToRender[i].gender}</td>
+            <td className='birthDate' onClick={ this.cellClick.bind(this, patientsToRender[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{patientsToRender[i].birthDate }</td>
 
-            {/* <td className='maritalStatus' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].maritalStatus}</td> */}
-            {/* <td className='language' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].language}</td> */}
-            <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
+            { this.renderMaritalStatus(patientsToRender[i]) }
+            { this.renderLanguage(patientsToRender[i]) }
 
-              { this.renderSpeciesRow(this.props.displaySpecies, this.data.patients[i]) }
-              { this.renderSendButton(this.data.patients[i], this.data.style.avatar) }
+            { this.renderIsActive(this.props.hideActive, patientsToRender[i].active) }
+            { this.renderSpeciesRow(this.props.hideSpecies, patientsToRender[i]) }
+            { this.renderActionButton(patientsToRender[i], styles.avatar) }
           </tr>
         );
       }
@@ -360,21 +345,23 @@ export class PatientTable extends React.Component {
               { this.renderToggleHeader() }
               { this.renderActionIconsHeader() }
               { this.renderRowAvatarHeader() }
-  
-              <th className='identifier' style={this.data.style.hideOnPhone}>Identifier</th>
+              {this.renderIdentifierHeader() }
+
+              {/* <th className='identifier' style={styles.hideOnPhone}>Identifier</th> */}
               <th className='name'>Name</th>
               <th className='gender'>Gender</th>
               <th className='birthdate' style={{minWidth: '100px'}}>Birthdate</th>
 
-              { this.renderMaritalStatusHeader(this.data.patients[i]) }
-              { this.renderLanguageHeader(this.data.patients[i]) }
+              { this.renderMaritalStatusHeader(patientsToRender[i]) }
+              { this.renderLanguageHeader(patientsToRender[i]) }
 
-              {/* <th className='maritalStatus' style={this.data.style.hideOnPhone}>Marital Status</th> */}
-              {/* <th className='language' style={this.data.style.hideOnPhone}>Language</th> */}
-              <th className='isActive' style={this.data.style.hideOnPhone}>Active</th>
+              {/* <th className='maritalStatus' style={styles.hideOnPhone}>Marital Status</th> */}
+              {/* <th className='language' style={styles.hideOnPhone}>Language</th> */}
+              {/* <th className='isActive' style={styles.hideOnPhone}>Active</th> */}
               
-              { this.renderSpeciesHeader(this.props.displaySpecies) }
-              { this.renderSendButtonHeader() }
+              {this.renderIsActiveHeader() }
+              { this.renderSpeciesHeader(this.props.hideSpecies) }
+              { this.renderActionButtonHeader() }
             </tr>
           </thead>
           <tbody>
@@ -391,15 +378,22 @@ PatientTable.propTypes = {
   id: PropTypes.string,
   data: PropTypes.array,
   fhirVersion: PropTypes.string,
-  showSendButton: PropTypes.bool,
-  displaySpecies: PropTypes.bool,
+  showActionButton: PropTypes.bool,
   onRowClick: PropTypes.func,
   hideToggle: PropTypes.bool,
   hideActionIcons: PropTypes.bool,
+  hideIdentifier: PropTypes.bool,
+  hideActive: PropTypes.bool,
   hideMaritalStatus: PropTypes.bool,
   hideLanguage: PropTypes.bool,
-  noDataMessagePadding: PropTypes.number  
+  hideSpecies: PropTypes.bool,
+  appWidth: PropTypes.number,
+  noDataMessagePadding: PropTypes.number,
+  paginationLimit: PropTypes.number,
+  onCellClick: PropTypes.func,
+  onRowClick: PropTypes.func,
+  onActionButtonClick: PropTypes.func,
+  actionButtonLabel: PropTypes.string
 };
 
-ReactMixin(PatientTable.prototype, ReactMeteorData);
 export default PatientTable;
