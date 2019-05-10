@@ -2,8 +2,11 @@ import { CardText, CardTitle } from 'material-ui/Card';
 import { Tab, Tabs } from 'material-ui/Tabs';
 import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
 
-import PatientDetail from './PatientDetail';
-import PatientTable from './PatientTable';
+// import PatientDetail from './PatientDetail';
+// import PatientTable from './PatientTable';
+
+import { PatientTable, PatientDetail } from 'material-fhir-ui';
+
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
