@@ -29,121 +29,101 @@ JsonRoutes.add("put", "/" + RestHelpers.fhirVersion + "/Patient/:id", function (
   RestHelpers.logging(req, 'PUT /fhir-3.0.0/Patient/' + req.params.id);
   RestHelpers.setHeaders(res);
   RestHelpers.oauthServerCheck(req);
+  RestHelpers.returnPostResponseAfterAccessCheck(req, res, function(req, res, filter, pagination){
+    if (req.body) {
+      patientUpdate = req.body;
+
+      // remove id and meta, if we're recycling a resource
+      delete req.body.id;
+      delete req.body.meta;
+
+      patientUpdate.resourceType = "Patient";
+      patientUpdate = Patients.toMongo(patientUpdate);
+      patientUpdate = Patients.prepForUpdate(patientUpdate);
 
 
+      process.env.DEBUG && console.log('-----------------------------------------------------------');
+      process.env.DEBUG && console.log('patientUpdate', JSON.stringify(patientUpdate, null, 2));
 
+      var patient = Patients.findOne(req.params.id);
+      var patientId;
 
-    var accessTokenStr = (req.params && req.params.access_token) || (req.query && req.query.access_token);
-    var accessToken = oAuth2Server.collections.accessToken.findOne({accessToken: accessTokenStr});    
+      if(patient){
+        process.env.DEBUG && console.log('Patient found...')
+        patientId = Patients.update({_id: req.params.id}, {$set: patientUpdate },  function(error, result){
+          if (error) {
+            process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
 
-    if (accessToken || process.env.NOAUTH || Meteor.settings.private.disableOauth) {
-      if (accessToken) {
-        process.env.TRACE && console.log('accessToken', accessToken);
-        process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
-      }
+            // Bad Request
+            RestHelpers.sendResult(res, {
+              code: 400
+            });
+          }
+          if (result) {
+            process.env.TRACE && console.log('result', result);
+            res.setHeader("Patient", "fhir/Patient/" + result);
+            res.setHeader("Last-Modified", new Date());
+            res.setHeader("ETag", "3.0.0");
 
+            var patients = Patients.find({_id: req.params.id});
+            var payload = [];
 
-      if (req.body) {
-        patientUpdate = req.body;
+            patients.forEach(function(record){
+              payload.push(Patients.prepForFhirTransfer(record));
+            });
 
-        // remove id and meta, if we're recycling a resource
-        delete req.body.id;
-        delete req.body.meta;
+            console.log("payload", payload);
 
-        patientUpdate.resourceType = "Patient";
-        patientUpdate = Patients.toMongo(patientUpdate);
-        patientUpdate = Patients.prepForUpdate(patientUpdate);
-
-
-        process.env.DEBUG && console.log('-----------------------------------------------------------');
-        process.env.DEBUG && console.log('patientUpdate', JSON.stringify(patientUpdate, null, 2));
-
-        var patient = Patients.findOne(req.params.id);
-        var patientId;
-
-        if(patient){
-          process.env.DEBUG && console.log('Patient found...')
-          patientId = Patients.update({_id: req.params.id}, {$set: patientUpdate },  function(error, result){
-            if (error) {
-              process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
-
-              // Bad Request
-              RestHelpers.sendResult(res, {
-                code: 400
-              });
-            }
-            if (result) {
-              process.env.TRACE && console.log('result', result);
-              res.setHeader("Patient", "fhir/Patient/" + result);
-              res.setHeader("Last-Modified", new Date());
-              res.setHeader("ETag", "3.0.0");
-
-              var patients = Patients.find({_id: req.params.id});
-              var payload = [];
-
-              patients.forEach(function(record){
-                payload.push(Patients.prepForFhirTransfer(record));
-              });
-
-              console.log("payload", payload);
-
-              // success!
-              RestHelpers.sendResult(res, {
-                code: 200,
-                data: Bundle.generate(payload)
-              });
-            }
-          });
-        } else {        
-          process.env.DEBUG && console.log('No patient found.  Creating one.');
-          patientUpdate._id = req.params.id;
-          patientId = Patients.insert(patientUpdate,  function(error, result){
-            if (error) {
-              process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
-
-              // Bad Request
-              RestHelpers.sendResult(res, {
-                code: 400
-              });
-            }
-            if (result) {
-              process.env.TRACE && console.log('result', result);
-              res.setHeader("Patient", "fhir/Patient/" + result);
-              res.setHeader("Last-Modified", new Date());
-              res.setHeader("ETag", "3.0.0");
-
-              var patients = Patients.find({_id: req.params.id});
-              var payload = [];
-
-              patients.forEach(function(record){
-                payload.push(Patients.prepForFhirTransfer(record));
-              });
-
-              console.log("payload", payload);
-
-              // success!
-              RestHelpers.sendResult(res, {
-                code: 201,
-                data: Bundle.generate(payload)
-              });
-            }
-          });        
-        }
-      } else {
-        // no body; Unprocessable Entity
-        RestHelpers.sendResult(res, {
-          code: 422
+            // success!
+            RestHelpers.sendResult(res, {
+              code: 200,
+              data: Bundle.generate(payload)
+            });
+          }
         });
-      }
+      } else {        
+        process.env.DEBUG && console.log('No patient found.  Creating one.');
+        patientUpdate._id = req.params.id;
+        patientId = Patients.insert(patientUpdate,  function(error, result){
+          if (error) {
+            process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
 
+            // Bad Request
+            RestHelpers.sendResult(res, {
+              code: 400
+            });
+          }
+          if (result) {
+            process.env.TRACE && console.log('result', result);
+            res.setHeader("Patient", "fhir/Patient/" + result);
+            res.setHeader("Last-Modified", new Date());
+            res.setHeader("ETag", "3.0.0");
+
+            var patients = Patients.find({_id: req.params.id});
+            var payload = [];
+
+            patients.forEach(function(record){
+              payload.push(Patients.prepForFhirTransfer(record));
+            });
+
+            console.log("payload", payload);
+
+            // success!
+            RestHelpers.sendResult(res, {
+              code: 201,
+              data: Bundle.generate(payload)
+            });
+          }
+        });        
+      }
     } else {
-      // Unauthorized
+      // no body; Unprocessable Entity
       RestHelpers.sendResult(res, {
-        code: 401
+        code: 422
       });
     }
 
-
+  })
 });
 
 
@@ -156,6 +136,7 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
   RestHelpers.logging(req, 'PUT /fhir-3.0.0/Patient/' + req.params.id);
   RestHelpers.setHeaders(res);
   RestHelpers.oauthServerCheck(req);
+
   RestHelpers.returnGetResponseAfterAccessCheck(req, res, function(filter, pagination){
     var patientData = Patients.findOne({_id: req.params.id});
     if (patientData) {
