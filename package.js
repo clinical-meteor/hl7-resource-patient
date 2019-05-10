@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '3.4.32',
+  version: '3.4.33',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -15,7 +15,7 @@ Package.onUse(function (api) {
 
   api.use('aldeed:collection2@3.0.0');
   api.use('clinical:hl7-resource-datatypes@4.0.0');
-  api.use('clinical:hl7-resource-bundle@1.4.0');
+  api.use('clinical:hl7-resource-bundle@1.5.5');
 
   api.use('simple:json-routes@2.1.0');
   api.use('momentjs:moment@2.17.1');

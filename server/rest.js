@@ -1,10 +1,11 @@
+import { get } from 'lodash';
+import { FhirApi } from './FhirApi';
 
 
 //==========================================================================================
 // Global Configs  
 
 var fhirVersion = 'fhir-3.0.0';
-
 
 if(typeof oAuth2Server === 'object'){
   JsonRoutes.Middleware.use(
@@ -19,51 +20,15 @@ JsonRoutes.setResponseHeaders({
 
 
 
-//==========================================================================================
-// Global Method Overrides
-
-// this is temporary fix until PR 132 can be merged in
-// https://github.com/stubailo/meteor-rest/pull/132
-
-JsonRoutes.sendResult = function (res, options) {
-  options = options || {};
-
-  // Set status code on response
-  res.statusCode = options.code || 200;
-
-  // Set response body
-  if (options.data !== undefined) {
-    var shouldPrettyPrint = (process.env.NODE_ENV === 'development');
-    var spacer = shouldPrettyPrint ? 2 : null;cd .
-    res.setHeader('Content-type', 'application/fhir+json; charset=utf-8');
-    res.write(JSON.stringify(options.data, null, spacer));
-  }
-
-  // We've already set global headers on response, but if they
-  // pass in more here, we set those.
-  if (options.headers) {
-    //setHeaders(res, options.headers);
-    options.headers.forEach(function(value, key){
-      res.setHeader(key, value);
-    });
-  }
-
-  // Send the response
-  res.end();
-};
-
-
-
 
 //==========================================================================================
 // Step 1 - Create New Patient  
 
-JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, next) {
-  process.env.DEBUG && console.log('PUT /fhir-3.0.0/Patient/' + req.params.id);
-  //process.env.DEBUG && console.log('PUT /fhir-3.0.0/Patient/' + req.query._count);
+JsonRoutes.add("put", "/" + FhirApi.fhirVersion + "/Patient/:id", function (req, res, next) {
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("content-type", "application/fhir+json; charset=utf-8");
+  FhirApi.logging(req, 'PUT /fhir-3.0.0/Patient/' + req.params.id);
+  FhirApi.setHeaders(res);
+
 
   var accessTokenStr = (req.params && req.params.access_token) || (req.query && req.query.access_token);
 
@@ -102,7 +67,7 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
               process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
 
               // Bad Request
-              JsonRoutes.sendResult(res, {
+              FhirApi.sendResult(res, {
                 code: 400
               });
             }
@@ -122,7 +87,7 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
               console.log("payload", payload);
 
               // success!
-              JsonRoutes.sendResult(res, {
+              FhirApi.sendResult(res, {
                 code: 200,
                 data: Bundle.generate(payload)
               });
@@ -136,7 +101,7 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
               process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
 
               // Bad Request
-              JsonRoutes.sendResult(res, {
+              FhirApi.sendResult(res, {
                 code: 400
               });
             }
@@ -156,7 +121,7 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
               console.log("payload", payload);
 
               // success!
-              JsonRoutes.sendResult(res, {
+              FhirApi.sendResult(res, {
                 code: 201,
                 data: Bundle.generate(payload)
               });
@@ -165,7 +130,7 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
         }
       } else {
         // no body; Unprocessable Entity
-        JsonRoutes.sendResult(res, {
+        FhirApi.sendResult(res, {
           code: 422
         });
 
@@ -174,13 +139,13 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
 
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -219,25 +184,25 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
         process.env.TRACE && console.log('patientData', patientData);
 
         // Success
-        JsonRoutes.sendResult(res, {
+        FhirApi.sendResult(res, {
           code: 200,
           data: Patients.prepForFhirTransfer(patientData)
         });
       } else {
         // Gone
-        JsonRoutes.sendResult(res, {
+        FhirApi.sendResult(res, {
           code: 204
         });
       }
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -295,7 +260,7 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
             process.env.TRACE && console.log('error', error);
 
             // Bad Request
-            JsonRoutes.sendResult(res, {
+            FhirApi.sendResult(res, {
               code: 400
             });
           }
@@ -314,7 +279,7 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
 
             //console.log("payload", payload);
             // Created
-            JsonRoutes.sendResult(res, {
+            FhirApi.sendResult(res, {
               code: 201,
               data: Bundle.generate(payload)
             });
@@ -323,20 +288,20 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
         console.log('patientId', patientId);
       } else {
         // Unprocessable Entity
-        JsonRoutes.sendResult(res, {
+        FhirApi.sendResult(res, {
           code: 422
         });
       }
 
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -377,19 +342,19 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history", function (req
         payload.push(Patients.prepForFhirTransfer(record));
       });
       // Success
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 200,
         data: Bundle.generate(payload, 'history')
       });
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -412,7 +377,7 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history/:versionId", fu
   
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -436,18 +401,18 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history/:versionId", fu
 
       process.env.TRACE && console.log('patientData', patientData);
 
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 200,
         data: Patients.prepForFhirTransfer(patientData)
       });
     } else {
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 204
       });
     }
 
   } else {
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 401
     });
   }
@@ -537,19 +502,19 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient", function (req, res, next) 
       });
 
       // Success
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 200,
         data: Bundle.generate(payload)
       });
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -598,19 +563,19 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient/:param", function (req, res
       //process.env.TRACE && console.log('patients', patients);
 
       // Success
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 200,
         data: Bundle.generate(payload)
       });
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
@@ -640,20 +605,20 @@ JsonRoutes.add("delete", "/" + fhirVersion + "/Patient/:id", function (req, res,
 
       if (Patients.find({_id: req.params.id}).count() === 0) {
         // No Content
-        JsonRoutes.sendResult(res, {
+        FhirApi.sendResult(res, {
           code: 204
         });
       } else {
         Patients.remove({_id: req.params.id}, function(error, result){
           if (result) {
             // No Content
-            JsonRoutes.sendResult(res, {
+            FhirApi.sendResult(res, {
               code: 204
             });
           }
           if (error) {
             // Conflict
-            JsonRoutes.sendResult(res, {
+            FhirApi.sendResult(res, {
               code: 409
             });
           }
@@ -663,13 +628,13 @@ JsonRoutes.add("delete", "/" + fhirVersion + "/Patient/:id", function (req, res,
 
     } else {
       // Unauthorized
-      JsonRoutes.sendResult(res, {
+      FhirApi.sendResult(res, {
         code: 401
       });
     }
   } else {
     // no oAuth server installed; Not Implemented
-    JsonRoutes.sendResult(res, {
+    FhirApi.sendResult(res, {
       code: 501
     });
   }
