@@ -74,7 +74,7 @@ export class PatientsPage extends React.Component {
     Session.set('patientPageTabIndex', 1);
   }
   onDeletePatient(context){
-    Patients._collection.animalremove({_id: context.state.patientId}, function(error, result){
+    Patients._collection.remove({_id: context.state.patientId}, function(error, result){
       if (error) {
         if(process.env.NODE_ENV === "test") console.log('Patients.insert[error]', error);
         Bert.alert(error.reason, 'danger');
