@@ -66,7 +66,12 @@ export class PatientCard extends React.Component {
       // <div className='patientCard' {...otherProps} style={style.patientCard} >
       <div className='patientCard' style={style.patientCard} >
         <Card zDepth={zDepth} style={ style.photo }>
-            <img id='avatarImage' className='avatarImage' ref='avatarImage' onError={this.imgError.bind(this)} src={ avatar } style={ style.avatar} />
+            <img 
+              id='avatarImage' 
+              className='avatarImage'  
+              onError={(e)=>{e.target.onerror = null; e.target.src="https://thumbnail.imgbin.com/8/21/21/imgbin-seaspace-corporation-computer-icons-user-icon-design-others-JPq6c3J0cLkF2zfJ19f1XDyDf_t.jpg"}}
+              src={ avatar } 
+              style={ style.avatar} />
         </Card>
         <GlassCard overflowY={overflowY} >
             <CardTitle
@@ -81,7 +86,6 @@ export class PatientCard extends React.Component {
                     <Col md={6}>
                       <TextField
                         id='givenNameInput'
-                        ref='given'
                         name='given'
                         type='text'
                         floatingLabelText='given name'
@@ -93,7 +97,6 @@ export class PatientCard extends React.Component {
                     <Col md={6}>
                       <TextField
                         id='familyNameInput'
-                        ref='family'
                         name='family'
                         type='text'
                         floatingLabelText='family name'
@@ -107,7 +110,6 @@ export class PatientCard extends React.Component {
                     <Col md={4}>
                       <TextField
                         id='birthdateInput'
-                        ref='birthdate'
                         name='birthdate'
                         type='date'
                         floatingLabelText='date of birth'
@@ -120,7 +122,6 @@ export class PatientCard extends React.Component {
                     <Col md={2}>
                       <TextField
                         id='genderInput'
-                        ref='gender'
                         name='gender'
                         type='text'
                         floatingLabelText='gender'
@@ -133,7 +134,6 @@ export class PatientCard extends React.Component {
                     <Col md={6}>
                       <TextField
                         id='avatarInput'
-                        ref='avatar'
                         name='avatar'
                         type='text'
                         floatingLabelText='avatar'
