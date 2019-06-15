@@ -69,7 +69,7 @@ export class PatientCard extends React.Component {
             <img 
               id='avatarImage' 
               className='avatarImage'  
-              onError={(e)=>{e.target.onerror = null; e.target.src="https://thumbnail.imgbin.com/8/21/21/imgbin-seaspace-corporation-computer-icons-user-icon-design-others-JPq6c3J0cLkF2zfJ19f1XDyDf_t.jpg"}}
+              onError={(e)=>{e.target.onerror = null; e.target.src="/packages/clinical_hl7-resource-patient/assets/noAvatar.png"}}
               src={ avatar } 
               style={ style.avatar} />
         </Card>
