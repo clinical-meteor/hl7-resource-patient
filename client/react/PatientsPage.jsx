@@ -1,9 +1,5 @@
-import { CardText, CardTitle } from 'material-ui/Card';
-import { Tab, Tabs } from 'material-ui/Tabs';
+import { CardText, CardTitle, RaisedButton, Tab, Tabs } from 'material-ui';
 import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
-
-// import PatientDetail from './PatientDetail';
-// import PatientTable from './PatientTable';
 
 import { PatientTable, PatientDetail } from 'material-fhir-ui';
 
@@ -33,6 +29,14 @@ Session.setDefault('selectedPatientId', false);
 Session.setDefault('fhirVersion', 'v1.0.2');
 
 export class PatientsPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      patientId: false,
+      patient: {}
+    }
+  }
+
   getMeteorData() {
     let data = {
       style: {
@@ -57,11 +61,14 @@ export class PatientsPage extends React.Component {
       data.paginationLimit = get(Meteor, 'settings.public.defaults.paginationLimit');
     }
 
-        
     if (Session.get('selectedPatientId')){
       data.selectedPatient = Patients.findOne({_id: Session.get('selectedPatientId')});
+      this.state.patient = Patients.findOne({_id: Session.get('selectedPatientId')});
+      this.state.patientId = Session.get('selectedPatientId');
     } else {
       data.selectedPatient = false;
+      this.state.patientId = false;
+      this.state.patient = {}
     }
 
     data.patients = Patients.find().fetch();
@@ -94,55 +101,57 @@ export class PatientsPage extends React.Component {
     //if(process.env.NODE_ENV === "test") console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&&')
     console.log('Saving a new Patient...', context.state)
 
-    let self = context;
-    let fhirPatientData = Object.assign({}, context.state.patient);
-
-    if(process.env.NODE_ENV === "test") console.log('fhirPatientData', fhirPatientData);
-
-
-    let patientValidator = PatientSchema.newContext();
-    console.log('patientValidator', patientValidator)
-    patientValidator.validate(fhirPatientData)
-
-    console.log('IsValid: ', patientValidator.isValid())
-    // console.log('ValidationErrors: ', patientValidator.validationErrors());
-
-    if (context.state.patientId) {
-      if(process.env.NODE_ENV === "test") console.log("Updating patient...");
-
-      delete fhirPatientData._id;
-
-      // not sure why we're having to respecify this; fix for a bug elsewhere
-      fhirPatientData.resourceType = 'Patient';
-
-      Patients._collection.update({_id: this.state.patientId}, {$set: fhirPatientData }, function(error, result){
-        if (error) {
-          if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
-          Bert.alert(error.reason, 'danger');
-        }
-        if (result) {
-          HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
-          Session.set('selectedPatientId', false);
-          Session.set('patientPageTabIndex', 1);
-          Bert.alert('Patient added!', 'success');
-        }
-      });
-    } else {
-      if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", fhirPatientData);
-
-      Patients._collection.insert(fhirPatientData, function(error, result) {
-        if (error) {
-          if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
-          Bert.alert(error.reason, 'danger');
-        }
-        if (result) {
-          HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
-          Session.set('patientPageTabIndex', 1);
-          Session.set('selectedPatientId', false);
-          Bert.alert('Patient added!', 'success');
-        }
-      });
-    }
+    if(get(context, 'state.patient')){
+      let self = context;
+      let fhirPatientData = Object.assign({}, context.state.patient);
+  
+      if(process.env.NODE_ENV === "test") console.log('fhirPatientData', fhirPatientData);
+  
+  
+      let patientValidator = PatientSchema.newContext();
+      console.log('patientValidator', patientValidator)
+      patientValidator.validate(fhirPatientData)
+  
+      console.log('IsValid: ', patientValidator.isValid())
+      // console.log('ValidationErrors: ', patientValidator.validationErrors());
+  
+      if (context.state.patientId) {
+        if(process.env.NODE_ENV === "test") console.log("Updating patient...");
+  
+        delete fhirPatientData._id;
+  
+        // not sure why we're having to respecify this; fix for a bug elsewhere
+        fhirPatientData.resourceType = 'Patient';
+  
+        Patients._collection.update({_id: this.state.patientId}, {$set: fhirPatientData }, function(error, result){
+          if (error) {
+            if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
+            Bert.alert(error.reason, 'danger');
+          }
+          if (result) {
+            HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
+            Session.set('selectedPatientId', false);
+            Session.set('patientPageTabIndex', 1);
+            Bert.alert('Patient added!', 'success');
+          }
+        });
+      } else {
+        if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", fhirPatientData);
+  
+        Patients._collection.insert(fhirPatientData, function(error, result) {
+          if (error) {
+            if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
+            Bert.alert(error.reason, 'danger');
+          }
+          if (result) {
+            HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
+            Session.set('patientPageTabIndex', 1);
+            Session.set('selectedPatientId', false);
+            Bert.alert('Patient added!', 'success');
+          }
+        });
+      }
+    } 
   }
   onTableRowClick(patientId){
     Session.set('selectedPatientId', patientId);
@@ -186,6 +195,22 @@ export class PatientsPage extends React.Component {
 
   render() {
     console.log('React.version: ' + React.version);
+
+    let actionButtons;
+    if (get(this, 'props.patientId')) {
+      actionButtons = <div>
+        <div onClick={this.onUpsertPatient.bind(this) } >Save</div>
+        <div onClick={this.onDeletePatient.bind(this) } >Delete</div>
+          {/* <RaisedButton id='updatePatientButton' className='updatePatientButton' label="Save" primary={true} onClick={this.onUpsertPatient } style={{marginRight: '20px'}} />
+          <RaisedButton id='deletePatientButton' label="Delete" onClick={this.onDeletePatient } /> */}
+        </div>
+    } else {
+      // actionButtons = <RaisedButton id='savePatientButton'  className='savePatientButton' label="Save" primary={true} onClick={this.onUpsertPatient } />
+      actionButtons = <div>
+        <div onClick={this.onUpsertPatient.bind(this) } >Save</div>
+      </div>
+    }
+
     return (
       <div id="patientsPage">
         <VerticalCanvas>
