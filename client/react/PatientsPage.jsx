@@ -109,21 +109,27 @@ export class PatientsPage extends React.Component {
   
   
       let patientValidator = PatientSchema.newContext();
-      console.log('patientValidator', patientValidator)
+      // console.log('patientValidator', patientValidator)
       patientValidator.validate(fhirPatientData)
   
-      console.log('IsValid: ', patientValidator.isValid())
-      // console.log('ValidationErrors: ', patientValidator.validationErrors());
+      if(process.env.NODE_ENV === "development"){
+        console.log('IsValid: ', patientValidator.isValid())
+        console.log('ValidationErrors: ', patientValidator.validationErrors());
   
-      if (context.state.patientId) {
-        if(process.env.NODE_ENV === "test") console.log("Updating patient...");
+      }
   
+      console.log('Checking context.state again...', context.state)
+      if (get(context, 'state.patientId')) {
+        if(process.env.NODE_ENV === "development") {
+          console.log("Updating patient...");
+        }
+
         delete fhirPatientData._id;
   
         // not sure why we're having to respecify this; fix for a bug elsewhere
         fhirPatientData.resourceType = 'Patient';
   
-        Patients._collection.update({_id: this.state.patientId}, {$set: fhirPatientData }, function(error, result){
+        Patients._collection.update({_id: context.state.patientId}, {$set: fhirPatientData }, function(error, result){
           if (error) {
             if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
             Bert.alert(error.reason, 'danger');
@@ -195,21 +201,6 @@ export class PatientsPage extends React.Component {
 
   render() {
     console.log('React.version: ' + React.version);
-
-    let actionButtons;
-    if (get(this, 'props.patientId')) {
-      actionButtons = <div>
-        <div onClick={this.onUpsertPatient.bind(this) } >Save</div>
-        <div onClick={this.onDeletePatient.bind(this) } >Delete</div>
-          {/* <RaisedButton id='updatePatientButton' className='updatePatientButton' label="Save" primary={true} onClick={this.onUpsertPatient } style={{marginRight: '20px'}} />
-          <RaisedButton id='deletePatientButton' label="Delete" onClick={this.onDeletePatient } /> */}
-        </div>
-    } else {
-      // actionButtons = <RaisedButton id='savePatientButton'  className='savePatientButton' label="Save" primary={true} onClick={this.onUpsertPatient } />
-      actionButtons = <div>
-        <div onClick={this.onUpsertPatient.bind(this) } >Save</div>
-      </div>
-    }
 
     return (
       <div id="patientsPage">
