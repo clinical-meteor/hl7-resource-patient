@@ -94,9 +94,20 @@ export class PatientDetail extends React.Component {
   dehydrateFhirResource(patient) {
     let formData = Object.assign({}, this.state.form);
 
+    if(typeof get(patient, 'name[0].family') === "array" ){
+      formData.family = get(patient, 'name[0].family[0]')
+    } else {
+      formData.family = get(patient, 'name[0].family')
+    }
+
+    if(typeof get(patient, 'name[0].given') === "array" ){
+      formData.given = get(patient, 'name[0].given[0]')
+    } else {
+      formData.given = get(patient, 'name[0].given')
+    }
+
+
     formData.prefix = get(patient, 'name[0].prefix[0]')
-    formData.family = get(patient, 'name[0].family[0]')
-    formData.given = get(patient, 'name[0].given[0]')
     formData.suffix = get(patient, 'name[0].suffix[0]')
     formData.identifier = get(patient, 'identifier[0].value')
     formData.deceased = get(patient, 'deceasedBoolean')
