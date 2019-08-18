@@ -36,11 +36,15 @@ Meteor.methods({
     }  
   },
   initializePatient:function(){
-    if (process.env.NIGHTWATCH || this.userId) {
+    if (process.env.NIGHTWATCH || this.userId || (["JaneDoe", 'init', 'initone'].includes(process.env.Patients))) {
         console.log('-----------------------------------------');
         console.log('No records found in Patients collection.  Lets create some...');
     
         var defaultPatient = {
+            '_id': 'janedoe',
+            'meta': {
+              'tag': ['test']
+            },
             'name' : [
             {
                 'text' : 'Jane Doe',
@@ -70,7 +74,9 @@ Meteor.methods({
             'resourceType' : 'Patient'
         };
     
-        Meteor.call('createPatient', defaultPatient);
+        if(Patients.findOne({_id: 'janedoe'}).count() === 0){
+          Meteor.call('createPatient', defaultPatient);
+        }
     } else {
       console.log('Not authorized.  Try logging in or setting NIGHTWATCH=true')
     }  
