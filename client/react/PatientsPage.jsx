@@ -204,7 +204,7 @@ export class PatientsPage extends React.Component {
 
     return (
       <div id="patientsPage">
-        <VerticalCanvas>
+        <FullPageCanvas>
           <GlassCard height="auto">
             <CardTitle
               title="Patients"
@@ -248,7 +248,7 @@ export class PatientsPage extends React.Component {
 
             </CardText>
           </GlassCard>
-        </VerticalCanvas>
+        </FullPageCanvas>
       </div>
     );
   }
