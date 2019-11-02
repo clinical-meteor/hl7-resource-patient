@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.13",
     "material-fhir-ui": "0.6.10",
     "moment": "^2.22.2",
     "simpl-schema": "^1.5.3",
