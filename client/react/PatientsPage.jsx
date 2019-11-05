@@ -1,12 +1,48 @@
-import { CardText, CardTitle, RaisedButton, Tab, Tabs } from 'material-ui';
-import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
+import React, { useState } from 'react';
 
-import { PatientTable, PatientDetail } from 'material-fhir-ui';
+import { 
+  CssBaseline,
+  Grid, 
+  Divider,
+  Container,
+  Card,
+  CardHeader,
+  CardContent,
+  Paper,
+  Button,
+  Tab, 
+  Tabs,
+  Typography,
+  Box
+} from '@material-ui/core';
+import PropTypes from 'prop-types';
 
-import React from 'react';
+// import { RaisedButton, Tab, Tabs } from 'material-ui';
+// import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
+
+import { PatientCard, PatientTable, PatientDetail } from 'material-fhir-ui';
+
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-import PropTypes from 'prop-types';
+
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      <Box p={3}>{children}</Box>
+    </Typography>
+  );
+}
+
 
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
@@ -27,13 +63,17 @@ Session.setDefault('patientFormData', defaultPatient);
 Session.setDefault('patientSearchFilter', '');
 Session.setDefault('selectedPatientId', false);
 Session.setDefault('fhirVersion', 'v1.0.2');
+Session.setDefault('patientPageTabIndex', 0)
+
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 export class PatientsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       patientId: false,
-      patient: {}
+      patient: {},
+      tabIndex: 0
     }
   }
 
@@ -73,11 +113,11 @@ export class PatientsPage extends React.Component {
 
     data.patients = Patients.find().fetch();
 
-    data.style = Glass.blur(data.style);
-    data.style.appbar = Glass.darkroom(data.style.appbar);
-    data.style.tab = Glass.darkroom(data.style.tab);
+    // data.style = Glass.blur(data.style);
+    // data.style.appbar = Glass.darkroom(data.style.appbar);
+    // data.style.tab = Glass.darkroom(data.style.tab);
 
-    if(process.env.NODE_ENV === "test") console.log("PatientsPage[data]", data);
+    if(process.env.NODE_ENV === "test") console.log("PatientsPageClass[data]", data);
     return data;
   }
   onCancelUpsertPatient(context){
@@ -190,9 +230,7 @@ export class PatientsPage extends React.Component {
       }
     });
   }
-  handleTabChange(index){
-    Session.set('patientPageTabIndex', index);
-  }
+
 
   onNewTab(){
     Session.set('selectedPatientId', false);
@@ -202,60 +240,58 @@ export class PatientsPage extends React.Component {
   render() {
     console.log('React.version: ' + React.version);
 
+    let self = this;
+
+    function handleTabChange(event, index){
+      console.log('index', index)
+      self.setState({tabIndex: index});
+    }
+
     return (
-      <div id="patientsPage">
-        <FullPageCanvas>
-          <GlassCard height="auto">
-            <CardTitle
-              title="Patients"
-            />
-            <CardText>
-              <Tabs id='patientsPageTabs' default value={this.data.tabIndex} onChange={this.handleTabChange} initialSelectedIndex={1}>
-                 <Tab className="newPatientTab" label='New' style={this.data.style.tab} onActive={ this.onNewTab } value={0}>
-                   <PatientDetail 
-                      fhirVersion={ this.data.fhirVersion }
-                      id='newPatient' 
-                      onDelete={ this.onDeletePatient }
-                      onUpsert={ this.onUpsertPatient }
-                      onCancel={ this.onCancelUpsertPatient } 
-                      />
-                 </Tab>
-                 <Tab className="patientListTab" label='Patients' onActive={this.handleActive} style={this.data.style.tab} value={1}>
-                   <PatientTable 
-                      noDataMessagePadding={100}
-                      patients={ this.data.patients }
-                      paginationLimit={ this.pagnationLimit }
-                      appWidth={ Session.get('appWidth') }
-                      actionButtonLabel="Send"
-                      onRowClick={ this.onTableRowClick }
-                      onCellClick={ this.onTableCellClick }
-                      onActionButtonClick={this.tableActionButtonClick}
-                      />
-                 </Tab>
-                 <Tab className="patientDetailTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
-                   <PatientDetail 
-                      id='patientDetails' 
-                      fhirVersion={ this.data.fhirVersion }
-                      patient={ this.data.selectedPatient }
-                      patientId={ this.data.selectedPatientId }
-                      onDelete={ this.onDeletePatient }
-                      onUpsert={ this.onUpsertPatient }
-                      onCancel={ this.onCancelUpsertPatient } 
-                    />
-                 </Tab>
-             </Tabs>
-
-
-            </CardText>
-          </GlassCard>
-        </FullPageCanvas>
+      <div id="patientsPageClass" style={{paddingLeft: '100px', paddingRight: '100px'}}>
+          <Container>
+            <Card>
+              <CardHeader title="Patients" />
+              <CardContent>
+                <Tabs value={this.state.tabIndex} onChange={ handleTabChange } aria-label="simple tabs example">
+                  <Tab label="Directory" />
+                  <Tab label="New" />
+                </Tabs>
+                <br />
+                <br />
+                <TabPanel value={this.state.tabIndex} index={0}>
+                  <PatientTable 
+                    // noDataMessagePadding={100}
+                    // patients={ this.data.patients }
+                    // paginationLimit={ this.pagnationLimit }
+                    // appWidth={ Session.get('appWidth') }
+                    // actionButtonLabel="Send"
+                    // onRowClick={ this.onTableRowClick }
+                    // onCellClick={ this.onTableCellClick }
+                    // onActionButtonClick={this.tableActionButtonClick}
+                  />    
+                </TabPanel>
+                <TabPanel value={this.state.tabIndex} index={1}>
+                  <PatientDetail 
+                    // id='patientDetails' 
+                    // fhirVersion={ this.data.fhirVersion }
+                    // patient={ this.data.selectedPatient }
+                    // patientId={ this.data.selectedPatientId }
+                    // onDelete={ this.onDeletePatient }
+                    // onUpsert={ this.onUpsertPatient }
+                    // onCancel={ this.onCancelUpsertPatient } 
+                  />
+                </TabPanel>  
+              </CardContent>
+            </Card>                
+          </Container>
       </div>
     );
   }
 }
 
-
-
 ReactMixin(PatientsPage.prototype, ReactMeteorData);
-
 export default PatientsPage;
+
+
+

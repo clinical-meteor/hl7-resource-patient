@@ -1,4 +1,4 @@
-
+import React from 'react';
 
 // import PatientDetail from './client/react/PatientDetail.js';
 // import PatientPickList from './client/react/PatientPickList.js';
@@ -12,10 +12,12 @@
 // import PatientTable from './client/react/PatientTable';
 
 import PatientsPage from './client/react/PatientsPage';
-import { PatientCard, PatientDetail, PatientTable } from 'material-fhir-ui';
-import { Patient, Patients, PatientSchema, PatientDstu2, PatientStu3 } from './lib/Patients';
+// import { PatientCard, PatientDetail, PatientTable } from 'material-fhir-ui';
+// import { Patient, Patients, PatientSchema, PatientDstu2, PatientStu3 } from './lib/Patients';
 
-const PatientTables = PatientTable;
+// const PatientTables = PatientTable;
+
+import { FaUserInjured } from 'react-icons/fa';
 
 var DynamicRoutes = [{
   'name': 'PatientPage',
@@ -27,24 +29,25 @@ var DynamicRoutes = [{
 var SidebarElements = [{
   'primaryText': 'Patients',
   'to': '/patients',
-  'href': '/patients'
+  'href': '/patients',
+  'icon': <FaUserInjured />
 }];
 
 export { 
   SidebarElements, 
   DynamicRoutes, 
 
-  PatientsPage,
-  PatientTable,
-  PatientsTable,
-  PatientDetail,
-  PatientCard,
+  PatientsPage
+  // PatientTable,
+  // PatientsTable,
+  // PatientDetail,
+  // PatientCard,
 
-  Patient,
-  Patients,
-  PatientSchema,
-  PatientDstu2, 
-  PatientStu3
+  // Patient,
+  // Patients,
+  // PatientSchema,
+  // PatientDstu2, 
+  // PatientStu3
 };
 
 
