@@ -17,10 +17,7 @@ import {
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 
-// import { RaisedButton, Tab, Tabs } from 'material-ui';
-// import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
-
-import { PatientCard, PatientTable, PatientDetail } from 'material-fhir-ui';
+import { PatientTable, PatientDetail } from 'material-fhir-ui';
 
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
@@ -64,8 +61,6 @@ Session.setDefault('patientSearchFilter', '');
 Session.setDefault('selectedPatientId', false);
 Session.setDefault('fhirVersion', 'v1.0.2');
 Session.setDefault('patientPageTabIndex', 0)
-
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 export class PatientsPage extends React.Component {
   constructor(props) {
