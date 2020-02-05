@@ -1,15 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { 
-  CssBaseline,
-  Grid, 
-  Divider,
-  Container,
   Card,
   CardHeader,
   CardContent,
-  Paper,
-  Button,
   Tab, 
   Tabs,
   Typography,
@@ -17,13 +11,83 @@ import {
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 
-// import { RaisedButton, Tab, Tabs } from 'material-ui';
-// import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
 
-import { PatientCard, PatientTable, PatientDetail } from 'material-fhir-ui';
+import { PatientTable, PatientDetail, PageCanvas, StyledCard } from 'material-fhir-ui';
 
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
+
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+// Global Theming 
+  // This is necessary for the Material UI component render layer
+  let theme = {
+    primaryColor: "rgb(108, 183, 110)",
+    primaryText: "rgba(255, 255, 255, 1) !important",
+
+    secondaryColor: "rgb(108, 183, 110)",
+    secondaryText: "rgba(255, 255, 255, 1) !important",
+
+    cardColor: "rgba(255, 255, 255, 1) !important",
+    cardTextColor: "rgba(0, 0, 0, 1) !important",
+
+    errorColor: "rgb(128,20,60) !important",
+    errorText: "#ffffff !important",
+
+    appBarColor: "#f5f5f5 !important",
+    appBarTextColor: "rgba(0, 0, 0, 1) !important",
+
+    paperColor: "#f5f5f5 !important",
+    paperTextColor: "rgba(0, 0, 0, 1) !important",
+
+    backgroundCanvas: "rgba(255, 255, 255, 1) !important",
+    background: "linear-gradient(45deg, rgb(108, 183, 110) 30%, rgb(150, 202, 144) 90%)",
+
+    nivoTheme: "greens"
+  }
+
+  // if we have a globally defined theme from a settings file
+  if(get(Meteor, 'settings.public.theme.palette')){
+    theme = Object.assign(theme, get(Meteor, 'settings.public.theme.palette'));
+  }
+
+  const muiTheme = createMuiTheme({
+    typography: {
+      useNextVariants: true,
+    },
+    palette: {
+      primary: {
+        main: theme.primaryColor,
+        contrastText: theme.primaryText
+      },
+      secondary: {
+        main: theme.secondaryColor,
+        contrastText: theme.errorText
+      },
+      appBar: {
+        main: theme.appBarColor,
+        contrastText: theme.appBarTextColor
+      },
+      cards: {
+        main: theme.cardColor,
+        contrastText: theme.cardTextColor
+      },
+      paper: {
+        main: theme.paperColor,
+        contrastText: theme.paperTextColor
+      },
+      error: {
+        main: theme.errorColor,
+        contrastText: theme.secondaryText
+      },
+      background: {
+        default: theme.backgroundCanvas
+      },
+      contrastThreshold: 3,
+      tonalOffset: 0.2
+    }
+  });
+
 
 
 function TabPanel(props) {
@@ -65,7 +129,6 @@ Session.setDefault('selectedPatientId', false);
 Session.setDefault('fhirVersion', 'v1.0.2');
 Session.setDefault('patientPageTabIndex', 0)
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 export class PatientsPage extends React.Component {
   constructor(props) {
@@ -93,8 +156,31 @@ export class PatientsPage extends React.Component {
       paginationLimit: 100,
       selectedPatient: false,
       selected: [],
-      patients: []
+      patients: [],
+      patientCount: 0,
+      dataCursors: []
     };
+
+    Patients.find().forEach(function(patient){
+      data.dataCursors.push({
+        Patients: (typeof Patients !== "undefined") ? Patients.find({id: patient.id}).count() : 0,
+        AllergyIntolerances: (typeof AllergyIntolerances !== "undefined") ? AllergyIntolerances.find({id: patient.id}).count() : 0,
+        Conditions: (typeof Conditions !== "undefined") ? Conditions.find({id: patient.id}).count() : 0,
+        CarePlans: (typeof CarePlans !== "undefined") ? CarePlans.find({id: patient.id}).count() : 0,
+        Devices: (typeof Devices !== "undefined") ? Devices.find({id: patient.id}).count() : 0,
+        Encounters: (typeof Encounters !== "undefined") ? Encounters.find({'patient.reference': 'Patient/' + patient.id}).count() : 0,
+        Immunizations: (typeof Immunizations !== "undefined") ? Immunizations.find({id: patient.id}).count() : 0,
+        Medications: (typeof Medications !== "undefined") ? Medications.find({id: patient.id}).count() : 0,
+        MedicationOrders: (typeof MedicationOrders !== "undefined") ? MedicationOrders.find({id: patient.id}).count() : 0,
+        MedicationStatements: (typeof MedicationStatements !== "undefined") ? MedicationStatements.find({id: patient.id}).count() : 0,
+        Observations: (typeof Observations !== "undefined") ? Observations.find({'subject.reference': 'Patient/' + patient.id}).count() : 0,
+        Organizations: (typeof Organizations !== "undefined") ? Organizations.find({id: patient.id}).count() : 0,
+        Persons: (typeof Persons !== "undefined") ? Persons.find({id: patient.id}).count() : 0,
+        Practitioners: (typeof Practitioners !== "undefined") ? Practitioners.find({id: patient.id}).count() : 0,
+        RelatedPersons: (typeof RelatedPersons !== "undefined") ? RelatedPersons.find({id: patient.id}).count() : 0,
+        Procedures: (typeof Procedures !== "undefined") ? Procedures.find({'subject.reference': 'Patient/' + patient.id}).count() : 0
+      })
+    })
 
     // number of items in the table should be set globally
     if (get(Meteor, 'settings.public.defaults.paginationLimit')) {
@@ -112,10 +198,7 @@ export class PatientsPage extends React.Component {
     }
 
     data.patients = Patients.find().fetch();
-
-    // data.style = Glass.blur(data.style);
-    // data.style.appbar = Glass.darkroom(data.style.appbar);
-    // data.style.tab = Glass.darkroom(data.style.tab);
+    data.patientCount = Patients.find().count();
 
     if(process.env.NODE_ENV === "test") console.log("PatientsPageClass[data]", data);
     return data;
@@ -127,13 +210,13 @@ export class PatientsPage extends React.Component {
     Patients._collection.remove({_id: context.state.patientId}, function(error, result){
       if (error) {
         if(process.env.NODE_ENV === "test") console.log('Patients.insert[error]', error);
-        Bert.alert(error.reason, 'danger');
+        // Bert.alert(error.reason, 'danger');
       }
       if (result) {
         HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
         Session.set('patientPageTabIndex', 1);
         Session.set('selectedPatientId', false);
-        Bert.alert('Patient removed!', 'success');
+        // Bert.alert('Patient removed!', 'success');
       }
     });
   }
@@ -172,13 +255,13 @@ export class PatientsPage extends React.Component {
         Patients._collection.update({_id: context.state.patientId}, {$set: fhirPatientData }, function(error, result){
           if (error) {
             if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
-            Bert.alert(error.reason, 'danger');
+            // Bert.alert(error.reason, 'danger');
           }
           if (result) {
             HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
             Session.set('selectedPatientId', false);
             Session.set('patientPageTabIndex', 1);
-            Bert.alert('Patient added!', 'success');
+            // Bert.alert('Patient added!', 'success');
           }
         });
       } else {
@@ -187,22 +270,23 @@ export class PatientsPage extends React.Component {
         Patients._collection.insert(fhirPatientData, function(error, result) {
           if (error) {
             if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
-            Bert.alert(error.reason, 'danger');
+            // Bert.alert(error.reason, 'danger');
           }
           if (result) {
             HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: context.state.patientId});
             Session.set('patientPageTabIndex', 1);
             Session.set('selectedPatientId', false);
-            Bert.alert('Patient added!', 'success');
+            // Bert.alert('Patient added!', 'success');
           }
         });
       }
     } 
   }
   onTableRowClick(patientId){
+    console.log('onTableRowClick', patientId);
+
     Session.set('selectedPatientId', patientId);
     Session.set('selectedPatient', Patients.findOne(patientId));
-
   }
   onTableCellClick(id){
     Session.set('patientsUpsert', false);
@@ -247,45 +331,55 @@ export class PatientsPage extends React.Component {
       self.setState({tabIndex: index});
     }
 
+    const rowsPerPage = get(Meteor, 'settings.public.defaults.rowsPerPage', 25);
+
+
+
     return (
-      <div id="patientsPageClass" style={{paddingLeft: '100px', paddingRight: '100px'}}>
-          <Container>
-            <Card>
-              <CardHeader title="Patients" />
-              <CardContent>
-                <Tabs value={this.state.tabIndex} onChange={ handleTabChange } aria-label="simple tabs example">
-                  <Tab label="Directory" />
-                  <Tab label="New" />
-                </Tabs>
-                <br />
-                <br />
-                <TabPanel value={this.state.tabIndex} index={0}>
-                  <PatientTable 
-                    // noDataMessagePadding={100}
-                    // patients={ this.data.patients }
-                    // paginationLimit={ this.pagnationLimit }
-                    // appWidth={ Session.get('appWidth') }
-                    // actionButtonLabel="Send"
-                    // onRowClick={ this.onTableRowClick }
-                    // onCellClick={ this.onTableCellClick }
-                    // onActionButtonClick={this.tableActionButtonClick}
-                  />    
-                </TabPanel>
-                <TabPanel value={this.state.tabIndex} index={1}>
-                  <PatientDetail 
-                    // id='patientDetails' 
-                    // fhirVersion={ this.data.fhirVersion }
-                    // patient={ this.data.selectedPatient }
-                    // patientId={ this.data.selectedPatientId }
-                    // onDelete={ this.onDeletePatient }
-                    // onUpsert={ this.onUpsertPatient }
-                    // onCancel={ this.onCancelUpsertPatient } 
-                  />
-                </TabPanel>  
-              </CardContent>
-            </Card>                
-          </Container>
-      </div>
+      <PageCanvas id="patientsPageClass" >
+        <MuiThemeProvider theme={muiTheme} >
+          <StyledCard height="auto" scrollable={true} margin={20} >
+            <CardHeader title="Patients" />
+            <CardContent>
+              <Tabs value={this.state.tabIndex} onChange={ handleTabChange } aria-label="simple tabs example">
+                <Tab label="Directory" />
+                <Tab label="New" />
+              </Tabs>
+              <br />
+              <br />
+              <TabPanel value={this.state.tabIndex} index={0}>
+                <PatientTable 
+                  noDataMessagePadding={100}
+                  patients={ this.data.patients }
+                  paginationLimit={ this.pagnationLimit }
+                  rowsPerPage={rowsPerPage}
+                  count={this.data.patientCount}
+                  onRowClick={ this.onTableRowClick }
+                  showCounts={true}
+                  cursors={this.data.dataCursors}
+                  hideActive={true}
+                  // appWidth={ Session.get('appWidth') }
+                  // actionButtonLabel="Send"
+                  // onCellClick={ this.onTableCellClick }
+                  // onActionButtonClick={this.tableActionButtonClick}
+                />    
+              </TabPanel>
+              <TabPanel value={this.state.tabIndex} index={1}>
+                <PatientDetail 
+                  // id='patientDetails' 
+                  // fhirVersion={ this.data.fhirVersion }
+                  // patient={ this.data.selectedPatient }
+                  // patientId={ this.data.selectedPatientId }
+                  // onDelete={ this.onDeletePatient }
+                  // onUpsert={ this.onUpsertPatient }
+                  // onCancel={ this.onCancelUpsertPatient } 
+                />
+              </TabPanel>  
+            </CardContent>
+          </StyledCard>                
+
+        </MuiThemeProvider>
+      </PageCanvas>
     );
   }
 }

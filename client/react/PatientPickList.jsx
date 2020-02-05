@@ -1,13 +1,26 @@
-import { Card, CardHeader, CardText, CardTitle } from 'material-ui/Card';
+import { 
+  CssBaseline,
+  Grid, 
+  Container,
+  Divider,
+  Card,
+  CardHeader,
+  CardContent,
+  Button,
+  Tab, 
+  Tabs,
+  Typography,
+  Box,
+  Dialog,
+  TextField
+} from '@material-ui/core';
+import { StyledCard, PageCanvas } from 'material-fhir-ui';
 
-import AccountCircle from 'material-ui/svg-icons/action/account-circle';
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+
 import PatientTable from './PatientTable';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
-import TextField from 'material-ui/TextField';
 
 import { Patients } from '../../lib/Patients';
 import { Session } from 'meteor/session';
@@ -41,24 +54,22 @@ export class PatientPickList extends React.Component {
   }  
   render() {
     const patientActions = [
-      <FlatButton
-        label="Clear"
+      <Button
         primary={true}
         onClick={this.handleClosePatients}
-      />,
-      <FlatButton
-        label="Select"
+      >Clear</Button>,
+      <Button
         primary={true}
         keyboardFocused={true}
         onClick={this.handleClosePatients}
-      />
+      >Select</Button>
     ];
     return(
-      <GlassCard>
-        <CardTitle
+      <StyledCard>
+        <CardHeader
           title="Patient Pick List"
         />
-        <CardText>
+        <CardContent>
 
           <TextField
             hintText="Jane Doe"
@@ -66,14 +77,13 @@ export class PatientPickList extends React.Component {
             onChange={this.changeInput.bind(this, 'description')}
             value={this.data.patientDialog.patient.display}
             fullWidth>
-              <FlatButton
-                label="Patients"
+              <Button                
                 className="patientsButton"
                 primary={true}
                 onClick={this.handleOpenPatients}
-                icon={ <AccountCircle /> }
+                // icon={ <AccountCircle /> }
                 style={{textAlign: 'right', cursor: 'pointer'}}
-              />
+              >Patients</Button>
             </TextField>
 
           <Dialog
@@ -83,7 +93,7 @@ export class PatientPickList extends React.Component {
             open={this.data.patientDialog.open}
             onRequestClose={this.handleClosePatients}
           >
-            <CardText style={{overflowY: "auto"}}>
+            <CardContent style={{overflowY: "auto"}}>
             <TextField
               hintText="Jane Doe"
               errorText="Patient Search"
@@ -91,10 +101,10 @@ export class PatientPickList extends React.Component {
               value={this.data.patientDialog.patient.display}
               fullWidth />
               <PatientTable />
-            </CardText>
+            </CardContent>
           </Dialog>
-        </CardText>
-      </GlassCard>
+        </CardContent>
+      </StyledCard>
     );
   }
 }
