@@ -17,7 +17,7 @@ import PatientsPage from './client/react/PatientsPage';
 
 // const PatientTables = PatientTable;
 
-import { FaUserInjured } from 'react-icons/fa';
+// import { FaUserInjured } from 'react-icons/fa';
 
 var DynamicRoutes = [{
   'name': 'PatientPage',
@@ -30,7 +30,7 @@ var SidebarElements = [{
   'primaryText': 'Patients',
   'to': '/patients',
   'href': '/patients',
-  'icon': <FaUserInjured />
+  'iconName': "FaUserInjured"
 }];
 
 export { 
@@ -38,16 +38,6 @@ export {
   DynamicRoutes, 
 
   PatientsPage
-  // PatientTable,
-  // PatientsTable,
-  // PatientDetail,
-  // PatientCard,
-
-  // Patient,
-  // Patients,
-  // PatientSchema,
-  // PatientDstu2, 
-  // PatientStu3
 };
 
 

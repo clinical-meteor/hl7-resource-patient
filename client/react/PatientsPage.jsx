@@ -129,7 +129,6 @@ Session.setDefault('selectedPatientId', false);
 Session.setDefault('fhirVersion', 'v1.0.2');
 Session.setDefault('patientPageTabIndex', 0)
 
-
 export class PatientsPage extends React.Component {
   constructor(props) {
     super(props);
