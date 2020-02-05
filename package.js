@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '5.2.3',
+  version: '5.2.5',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -31,6 +31,7 @@ Package.onUse(function (api) {
   api.imply('clinical:user-model');
 
   api.addFiles('lib/Patients.js');
+
   // api.addFiles('server/methods.js', 'server');
   // api.addFiles('server/rest.js', 'server');
 
@@ -54,7 +55,6 @@ Npm.depends({
   "validator": "10.9.0",
   "lodash": "4.17.13",
   "material-fhir-ui": "0.9.19",
-  "react-icons": "3.8.0",
   "winston": "3.2.1"
 });
 
