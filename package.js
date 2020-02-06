@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-patient',
-  version: '5.2.7',
+  version: '5.2.8',
   summary: 'HL7 FHIR Resource - Patient',
   git: 'https://github.com/clinical-meteor/hl7-resource-patient',
   documentation: 'README.md'
@@ -54,6 +54,7 @@ Npm.depends({
   "moment": "2.22.2",
   "validator": "10.9.0",
   "lodash": "4.17.13",
-  "material-fhir-ui": "0.9.19"
+  "material-fhir-ui": "0.9.19",
+
 });
 
