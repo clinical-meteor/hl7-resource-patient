@@ -54,7 +54,6 @@ Npm.depends({
   "moment": "2.22.2",
   "validator": "10.9.0",
   "lodash": "4.17.13",
-  "material-fhir-ui": "0.9.19",
-  "winston": "3.2.1"
+  "material-fhir-ui": "0.9.19"
 });
 
